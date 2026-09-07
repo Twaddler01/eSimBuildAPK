@@ -11,20 +11,7 @@ if (DEBUG) {
 // window (global) functions
 import('./utils/globalHelpers.js');
 
-// PHASER START
-/*const MAX_WIDTH = 1280; // Max width for mobile portrait
-const MAX_HEIGHT = 1920; // Max height for mobile portrait
-const ASPECT_RATIO = 3 / 2; // Portrait aspect ratio (adjust as needed)
-
-function getGameSize() {
-    let width = Math.min(window.innerWidth, MAX_WIDTH); // Ensure the width is portrait-friendly
-    let height = Math.min(window.innerHeight, width * ASPECT_RATIO); // Maintain aspect ratio
-
-    return { width, height };
-}
-
-const { width, height } = getGameSize();
-*/
+/*
 const config = {
     type: Phaser.AUTO,
     parent: 'main',
@@ -40,13 +27,35 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
+*/
+
+const config = {
+    type: Phaser.AUTO,
+
+    parent: 'main',
+
+    scene: [
+        BootScene,
+        CreationScene,
+        ConversationScene
+    ],
+
+    width: 360,
+    height: 640,
+
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+};
 
 const game = new Phaser.Game(config);
 
-/*
-// Optional resize handler (may not be necessary if using Phaser's FIT mode)
-window.addEventListener("resize", () => {
-    const { width, height } = getGameSize();
-    game.scale.resize(width, height);
-});
-*/
+setTimeout(() => {
+    console.log('Phaser game...', game);
+    console.log('Scale:' + game.scale.width + ' ' + game.scale.height);
+    console.log('Canvas:'); // + game.canvas);
+    console.log(game.canvas);
+    console.log('Canvas size:' + game.canvas?.width + ' ' + game.canvas?.height);
+    console.log('Canvas CSS:' + game.canvas?.style.cssText);
+}, 1000);
