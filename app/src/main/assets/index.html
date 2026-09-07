@@ -35,17 +35,36 @@
 
 <body>
 
-    <div id="productionErrorLog"></div>
-    <div id="consoleLog"></div>
-    <div id="debugButtons"></div>
-    <div id="main"></div>
+    <div id="main1"></div>
+    <div id="main2"></div>
 
-    <script src="phaser.js"></script>
-    <script src="main.js" type="module"></script>
-<!--
-    <script src="./debug/console.js" type="module"></script>
--->
+    <script src="./main.js" type="module"></script>
+
+<script>
+document.getElementById("main1").innerHTML = `
+    <div style="
+        color: white;
+        background-color: #111111;
+        font-family: Arial;
+        font-size: 30px;
+        text-align: center;
+        margin-top: 100px;
+    ">
+        js works!  ... index.htnl ... 0
+    </div>
+    
+    <div style="
+        color: black;
+        background-color: white;
+        font-family: Arial;
+        font-size: 30px;
+        text-align: center;
+        margin-top: 100px;
+    ">
+        js works!  ... index.html ... 0
+    </div>
+`;
+</script>
 
 </body>
-
 </html>

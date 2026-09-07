@@ -1,6 +1,4 @@
-//import TestScene from './TestScene.js';
-
-document.getElementById("main").innerHTML = `
+document.getElementById("main2").innerHTML = `
     <div style="
         color: white;
         background-color: #111111;
@@ -9,7 +7,7 @@ document.getElementById("main").innerHTML = `
         text-align: center;
         margin-top: 100px;
     ">
-        main.js works!  ...
+        ES MODULE  works!  ... 0
     </div>
     
     <div style="
@@ -20,7 +18,7 @@ document.getElementById("main").innerHTML = `
         text-align: center;
         margin-top: 100px;
     ">
-        main.js works!  ...
+        ES MODULE  works!  ... 0
     </div>
 `;
 
