@@ -1,4 +1,4 @@
-import BootScene from './scenes/BootScene.js';
+/*import BootScene from './scenes/BootScene.js';
 import CreationScene from './scenes/CreationScene.js';
 import ConversationScene from './scenes/ConversationScene.js';
 
@@ -47,7 +47,7 @@ addText(scene, 100, 100, amount, {
     formatNumber: true
 });
 */
-
+/*
 // helper ^ window.addText
 function formatNumber(value) {
     if (typeof value !== 'number') {
@@ -140,7 +140,7 @@ console.timeEnd('test'); // End timer + elapsed time
 console.count('name');   // Count how many times something runs
 console.trace();         // Show the call stack
 */
-
+/*
 // PHASER START
 const MAX_WIDTH = 1280; // Max width for mobile portrait
 const MAX_HEIGHT = 1920; // Max height for mobile portrait
@@ -184,4 +184,15 @@ const game = new Phaser.Game(config);
 window.addEventListener("resize", () => {
     const { width, height } = getGameSize();
     game.scale.resize(width, height);
-});
+});*/
+
+const consoleLog = document.getElementById('productionErrorLog');
+if (!consoleLog) return;
+
+consoleLog.innerHTML = `
+ES MODULE TESTING -->
+
+main.js
+phaser.js
+
+`;
