@@ -1,3 +1,5 @@
+import TestScene from './TestScene.js';
+
 document.getElementById("main2").innerHTML = `
     <div style="
         color: white;
@@ -22,7 +24,6 @@ document.getElementById("main2").innerHTML = `
     </div>
 `;
 
-/*
 const config = {
     parent: 'main',
     width: 360,
@@ -38,4 +39,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-*/
