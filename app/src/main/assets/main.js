@@ -1,198 +1,16 @@
-//import BootScene from './scenes/BootScene.js';
-//import CreationScene from './scenes/CreationScene.js';
-//import ConversationScene from './scenes/ConversationScene.js';
+/*document.getElementById("main").innerHTML = `
+    <div style="
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        text-align: center;
+        margin-top: 100px;
+    ">
+        main.js works!  ...3
+    </div>
+`;*/
 
-//import TestScene from './TestScene.js';
-
-
-/*import { DEBUG } from './config.js';
-if (DEBUG) {
-    import('./debug/debug.js'); // logExport, htmlExport
-    import('./debug/zoom.js'); // zoom
-}*/
-
-// window (global) functions
-//import('./utils/globalHelpers.js');
-// globalHelpers.js
-
-// ==================================================
-// GAME HELPERS
-// ==================================================
-
-const DEFAULT_FONT_FAMILY = 'Arial';
-
-window.addText = function (scene, x, y, text, style = {}) {
-
-    const displayText =
-        style.formatNumber
-            ? formatNumber(text)
-            : text;
-
-    const finalStyle = {
-        ...style
-    };
-
-    delete finalStyle.formatNumber;
-
-    return scene.add.text(
-        x,
-        y,
-        displayText,
-        {
-            fontFamily: DEFAULT_FONT_FAMILY,
-            ...finalStyle
-        }
-    );
-};
-
-/* USAGE
-addText(scene, 100, 100, amount, {
-    formatNumber: true
-});
-*/
-
-// helper ^ window.addText
-function formatNumber(value) {
-    if (typeof value !== 'number') {
-        return value;
-    }
-
-    value = Math.round(value);
-
-    const abs = Math.abs(value);
-
-    if (abs >= 1_000_000) {
-        return `${(value / 1_000_000)
-            .toFixed(1)
-            .replace(/\.0$/, '')}m`;
-    }
-
-    if (abs >= 1_000) {
-        return `${(value / 1_000)
-            .toFixed(1)
-            .replace(/\.0$/, '')}k`;
-    }
-
-    return value.toString();
-}
-
-// ==================================================
-// DEBUGGING
-// ==================================================
-
-window.jp = (...args) => {
-
-    if (args.length !== 1) {
-        console.log(...args);
-        return;
-    }
-
-    const item = args[0];
-
-    // Array of Object.entries()
-    if (
-        Array.isArray(item) &&
-        item.every(
-            entry =>
-                Array.isArray(entry) &&
-                entry.length === 2
-        )
-    ) {
-        console.table(
-            Object.fromEntries(item)
-        );
-        return;
-    }
-
-    // Regular arrays
-    if (Array.isArray(item)) {
-        console.log(
-            JSON.stringify(item, null, 2)
-        );
-        return;
-    }
-
-    // Objects
-    if (
-        item !== null &&
-        typeof item === 'object'
-    ) {
-        try {
-            console.log(
-                JSON.stringify(item, null, 2)
-            );
-        } catch {
-            console.log(item);
-        }
-        return;
-    }
-
-    console.log(item);
-};
-
-/*
-OTHER USEFUL CONSOLE FUBCTIONS:
-console.dir(object);     // Interactive object inspection
-console.table(array);    // Excellent for arrays/objects
-console.group('Name');   // Start a collapsible group
-console.groupEnd();      // End group
-console.warn('Warning'); // Yellow warning
-console.error('Error');  // Error
-console.time('test');    // Start timer
-console.timeEnd('test'); // End timer + elapsed time
-console.count('name');   // Count how many times something runs
-console.trace();         // Show the call stack
-*/
-
-    class TestScene extends Phaser.Scene {
-
-        constructor() {
-            super("TestScene");
-        }
-
-        create() {
-
-            const { width, height } = this.scale;
-
-            this.add.text(
-                width / 2,
-                height / 2 - 50,
-                "Phaser Works!",
-                {
-                    fontFamily: "Arial",
-                    fontSize: "48px",
-                    color: "#ffffff"
-                }
-            ).setOrigin(0.5);
-
-            const button = this.add.text(
-                width / 2,
-                height / 2 + 50,
-                "CLICK ME",
-                {
-                    fontFamily: "Arial",
-                    fontSize: "32px",
-                    color: "#00ff00",
-                    backgroundColor: "#222222",
-                    padding: {
-                        left: 20,
-                        right: 20,
-                        top: 10,
-                        bottom: 10
-                    }
-                }
-            )
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true });
-
-            button.on("pointerdown", () => {
-
-                button.setText("PHASER INPUT WORKS!");
-
-                console.log("Phaser pointerdown works!");
-            });
-        }
-    }
+import TestScene from './TestScene.js';
 
 const config = {
     parent: 'main',
@@ -200,10 +18,7 @@ const config = {
     height: 640,
     type: Phaser.AUTO,
     scene: [ 
-        TestScene,
-        //BootScene,
-        //CreationScene,
-        //ConversationScene
+        TestScene
     ],
     scale: {
         mode: Phaser.Scale.RESIZE,
@@ -212,15 +27,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-
-/*
-const main = document.getElementById('main');
-main.innerHTML = `
-ES MODULE TESTING --><br>
-main.js<br>
-phaser.js<br>
-consple.js<br>
-# 4
-
-`;
-*/
