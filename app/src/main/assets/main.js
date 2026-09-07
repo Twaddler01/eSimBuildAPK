@@ -186,12 +186,12 @@ window.addEventListener("resize", () => {
     game.scale.resize(width, height);
 });*/
 
-const consoleLog = document.getElementById('productionErrorLog');
-if (!consoleLog) return;
-
-consoleLog.innerHTML = `
-ES MODULE TESTING -->
-
-main.js
+const main = document.getElementById('main');
+main.innerHTML = `
+ES MODULE TESTING --><br>
+main.js<br>
+phaser.js<br>
+consple.js<br>
+# 4
 
 `;
