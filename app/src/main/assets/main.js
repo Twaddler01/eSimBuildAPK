@@ -193,6 +193,5 @@ consoleLog.innerHTML = `
 ES MODULE TESTING -->
 
 main.js
-phaser.js
 
 `;
