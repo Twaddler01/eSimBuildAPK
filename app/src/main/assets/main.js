@@ -1,4 +1,6 @@
-/*document.getElementById("main").innerHTML = `
+import TestScene from './TestScene.js';
+
+document.getElementById("main").innerHTML = `
     <div style="
         color: white;
         font-family: Arial;
@@ -8,10 +10,9 @@
     ">
         main.js works!  ...3
     </div>
-`;*/
+`;
 
-import TestScene from './TestScene.js';
-
+/*
 const config = {
     parent: 'main',
     width: 360,
@@ -27,3 +28,4 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+*/
