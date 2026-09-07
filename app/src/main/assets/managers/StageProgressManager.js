@@ -1,0 +1,750 @@
+import { getItemMax } from '../utils/stageHelpers.js';
+
+export default class StageProgressManager {
+
+    constructor(stageProgressState, data = {}) {
+
+        this.stageData = data.stageData;
+        this.gameData = data.gameData;
+        
+        this.gatherCards = data.gatherCards;
+        this.createItemsCards = data.createItemsCards;
+        this.createUpgradesCards = data.createUpgradesCards;
+        this.discoverCards = data.discoverCards;
+        this.allCardData = data.allCardData;
+        
+        // Sync with save
+        this.state = stageProgressState;
+
+        // Player's current stage
+        this.stage =
+            this.gameData.currentStage.stage;
+
+        // Current quantities
+        this.values =
+            this.state.data.amounts ??= {};
+
+        // Gather upgrade levels
+        this.gatherLevels =
+            this.state.data.gatherLevels ??= {};
+        
+        this.autoGatherLevels =
+            this.state.data.autoGatherLevels ??= {};
+
+        this.unlocked =
+            this.state.data.unlocked ??= {};
+
+        // Observable changes
+        this.events =
+            new Phaser.Events.EventEmitter();
+    }
+
+    // data: card item (output)
+    getCardUpdates(data, requirements) {
+
+        const producesItems = [];
+        // Get produce data
+        if (data.produces) {
+            Object.entries(data.produces).forEach(([pro, val]) => {
+                const title = this.getItemTitle(pro) ?? pro;
+                producesItems.push({
+                    id: pro,
+                    title: title,
+                    producesCnt: val
+                });
+            });
+        }
+
+        const allData = [];
+        if (requirements) {
+            requirements.forEach(item => {
+                const amt = this.get(item.id);
+                allData.push({
+                    ...item,
+                    cnt: amt,
+                    output: item.title + ' ' + amt + ' / ' + item.amt,
+                    met: amt >= item.amt,
+                    color: amt >= item.amt ? '#66ff66' : '#ff6666',
+                });
+            });
+        }
+
+        if (allData.length === 0) {
+            return false;
+        }
+
+        return {
+            id: data.id,
+            requirements: allData,
+            produces: producesItems ?? null
+        };
+    }
+
+    // Lock state
+    getLockState(item) {
+        const unlocked = item.startsUnlocked || this.getUnlocked(item.id);
+        
+        if (unlocked) {
+            return 'unlocked';
+        }
+        
+        return 'locked';
+    }
+
+    getCardState(item) {
+        // DISCOVER: objectivesManager.getObjectiveAvailability(item)
+        if (item.tab === 'discover') {
+            return;
+        }
+
+        let tab = item.tab;
+        const subTab = item.subTab;
+        
+        if (subTab === 'upgrades') {
+            tab = 'create-upgrades';
+        }
+        
+        const isUnlocked = this.getUnlocked(item.id);
+        let requirementsMet = false;
+        let state = 'locked';
+        switch (tab) {
+            case 'gather':
+
+                const unlocked =
+                    item.startsUnlocked ||
+                    this.getUnlocked(item.id);
+        
+                if (unlocked) {
+                    state = 'active';
+                }
+        
+                const amount =
+                    this.get(item.id);
+            
+                const max =
+                    getItemMax(item, this);
+            
+                if (
+                    max != null &&
+                    amount >= max
+                ) {
+                    state = 'maxed';
+                }
+
+                return state;
+            case 'create':
+    
+                if (isUnlocked) {
+                    state = 'active';
+                }
+
+                requirementsMet =
+                    Object.entries(item.requirements ?? {})
+                        .every(([id, required]) => {
+                            return this.get(id) >= required;
+                        });
+        
+                if (isUnlocked && !requirementsMet) {
+                    state = 'notReady';
+                }
+        
+                return state;
+            case 'create-upgrades':
+        
+                if (isUnlocked) {
+                    const level = this.autoGatherLevels[item.item];
+                    state = 'active';
+                }
+    
+                if (item.requirements) {
+                    requirementsMet = item.requirements
+                        .every(req => this.get(req.id) >= req.amt);
+                } else {
+                    requirementsMet = true;
+                }
+                
+                if (isUnlocked && !requirementsMet) {
+                    state = 'notReady';
+                }
+                return state;
+        }
+    }
+
+//--------------------------------
+//ggg getCurrentTabCardData => item functions for GATHER/CREATE
+//--------------------------------
+
+    // AUTO GATHER
+    syncAutoGather() {
+        this.autoGather.clear();
+    
+        for (const item of this.getGatherItems()) {
+    
+            const autoAmt =
+                this.getAutoGatherAmount(
+                    item.id
+                );
+    
+            if (autoAmt <= 0) {
+                continue;
+            }
+    
+            this.autoGather.setActive(
+                item.id,
+                autoAmt
+            );
+        }
+    }
+    
+    handleAutoGather(itemId, autoAmt) {
+        const item =
+            this.getGatherItems()
+                .find(item => item.id === itemId);
+        if (!item) {
+            return;
+        }
+        this.gather(item, autoAmt);
+    }
+    
+    upgradeAutoGather(itemId, requirements) {
+        
+        // Deduct costs
+        if (requirements) {
+            requirements.forEach(req => {
+                this.remove(
+                    req.id,
+                    req.amt
+                );
+            });
+        }
+        
+        // Set level
+        const current =
+            this.getAutoGatherAmount(itemId);
+    
+        const newLevel =
+            current + 1;
+    
+        this.setAutoGatherLevel(
+            itemId,
+            newLevel
+        );
+        
+        return newLevel;
+    }
+
+    getAutoGatherAmount(itemId) {
+        const level =
+            this.autoGatherLevels[itemId] ?? 0;
+        return level;
+    }
+
+    setAutoGatherLevel(id, level) {
+        const newLevel =
+            Math.max(0, level);
+    
+        this.autoGatherLevels[id] =
+            newLevel;
+    
+        this.sync();
+    
+        this.events.emit(
+            'updated',
+            {
+                type: 'gather-auto-upgrade',
+                id,
+                level: newLevel
+            }
+        );
+    
+        return newLevel;
+    }
+
+    gather(item, autoAmt = 0) {
+        const current =
+            this.get(item.id);
+    
+        const upgradeStats =
+            this.getGatherUpgradeStats(
+                item.id,
+                item
+            );
+    
+        const max =
+            upgradeStats.current_max;
+    
+        const gatherAmount =
+            autoAmt > 0
+                ? autoAmt
+                : this.getGatherAmount(item);
+    
+        const newAmount =
+            max == null
+                ? current + gatherAmount
+                : Math.min(
+                    current + gatherAmount,
+                    max
+                );
+    
+        this.set(
+            item.id,
+            newAmount
+        );
+    
+        this.gatherUpgradeAvailable(item);
+    }
+    
+    //ccc Create
+    create(item) {
+        const requirements =
+            item.requirements ?? {};
+
+        const canCreate =
+            Object.entries(requirements)
+                .every(([id, required]) => {
+
+                    const amount =
+                        this.get(id);
+
+                    return amount >= required;
+                });
+
+        if (!canCreate) {
+            return;
+        }
+
+        // Consume
+        Object.entries(requirements)
+            .forEach(([id, amount]) => {
+
+                this.add(
+                    id,
+                    -amount
+                );
+            });
+
+        // Produce
+        Object.entries(item.produces ?? {})
+            .forEach(([id, amount]) => {
+
+                // If produced item triggers requirements
+                if (!this.getUnlocked(id)) {
+                    this.unlock(id);
+                }
+
+                this.add(
+                    id,
+                    amount
+                );
+            });
+    }
+
+    handleCardAction(item, tab) {
+        // Gather
+        if (tab === 'gather') {
+            this.gather(item);
+        }
+    
+        // Create
+        if (tab === 'create') {
+            this.create(item);
+            return;
+        }
+    }
+
+    getGatherUpgradeStats(id, item) {
+        const upgrade =
+            item.gather?.upgrade;
+    
+        const rateIncrease =
+            upgrade?.rateIncrease ?? 0;
+    
+        const maxIncrease =
+            upgrade?.maxIncrease ?? 0;
+    
+        const level =
+            this.getGatherLevel(id);
+    
+        const baseMax =
+            item.max ?? null;
+    
+        const currentMax =
+            baseMax == null
+                ? null
+                : baseMax + level * maxIncrease;
+    
+        const currentGatherRate =
+            1 + level * rateIncrease;
+    
+        const hasRateUpgrade =
+            rateIncrease > 0;
+    
+        const hasMaxUpgrade =
+            maxIncrease > 0;
+    
+        const hasUpgrade =
+            this.hasGatherUpgrade(item);
+    
+        const cost =
+            currentMax != null
+                ? Math.ceil(currentMax * 0.9)
+                : null;
+    
+        return {
+            id,
+            level,
+    
+            hasUpgrade,
+            hasRateUpgrade,
+            hasMaxUpgrade,
+    
+            base_max: baseMax,
+            current_max: currentMax,
+    
+            rateIncrease,
+            maxIncrease,
+    
+            currentGatherRate,
+    
+            cost
+        };
+    }
+
+    gatherUpgradeAvailable(item) {
+        if (!this.hasGatherUpgrade(item)) {
+            return false;
+        }
+    
+        const stats =
+            this.getGatherUpgradeStats(
+                item.id,
+                item
+            );
+    
+        const current =
+            this.get(item.id);
+
+        // If there is a rate upgrade, make sure
+        // another rate level would still be useful.
+        const rateIsUseful =
+            !stats.hasRateUpgrade ||
+            stats.currentGatherRate < stats.current_max;
+    
+        // If this is max-only, this remains true.
+        // If this is rate-only, it prevents useless
+        // rate upgrades after reaching the max.
+        if (!rateIsUseful) {
+            return false;
+        }
+
+        return current >= stats.cost;
+    }
+
+    upgradeGather(item) {
+        if (!this.gatherUpgradeAvailable(item)) {
+            return false;
+        }
+    
+        const stats =
+            this.getGatherUpgradeStats(item.id, item);
+    
+        // Pay the cost
+        this.add(
+            item.id,
+            -stats.cost
+        );
+    
+        // Increase level
+        this.addGatherLevel(
+            item.id,
+            1
+        );
+    
+        return true;
+    }
+
+//--------------------------------
+//ggg OTHER GATHER FUNCTIONS
+//--------------------------------
+
+    getGatherItems() {
+        return this.gatherCards;
+    }
+
+    hasGatherUpgrade(item) {
+        const upgrade =
+            item.gather?.upgrade;
+    
+        if (!upgrade) {
+            return false;
+        }
+    
+        // Explicitly disabled
+        if (upgrade.enabled === false) {
+            return false;
+        }
+    
+        const hasRate =
+            (upgrade.rateIncrease ?? 0) > 0;
+    
+        const hasMax =
+            (upgrade.maxIncrease ?? 0) > 0;
+    
+        // enabled:true OR legacy/missing enabled
+        // with an actual upgrade value.
+        return (
+            upgrade.enabled === true ||
+            hasRate ||
+            hasMax
+        );
+    }
+
+    getGatherAmount(item) {
+        const baseAmount = 1;
+    
+        const upgrade =
+            item.gather?.upgrade;
+    
+        if (
+            !upgrade ||
+            upgrade.enabled === false ||
+            (upgrade.rateIncrease ?? 0) <= 0
+        ) {
+            return baseAmount;
+        }
+    
+        const level =
+            this.getGatherLevel(item.id);
+    
+        return (
+            baseAmount +
+            level * upgrade.rateIncrease
+        );
+    }
+
+    // Gather upgrade levels
+    getGatherLevel(id) {
+        return this.gatherLevels[id] ?? 0;
+    }
+
+    setGatherLevel(id, level) {
+        const newLevel =
+            Math.max(0, level);
+
+        this.gatherLevels[id] =
+            newLevel;
+
+        this.sync();
+
+        this.events.emit(
+        'updated',
+        {
+            type: 'gather-upgrade',
+            id,
+            level: newLevel
+        }
+    );
+
+        return newLevel;
+    }
+
+    addGatherLevel(id, amount = 1) {
+        return this.setGatherLevel(
+            id,
+            this.getGatherLevel(id) + amount
+        );
+    }
+
+//--------------------------------
+//ccc functions for CREATE
+//--------------------------------
+
+    getCreateItems() {
+        return this.createItemsCards;
+    }
+
+    // --------------------------------------------------
+    // GETTERS AND SETTERS
+    // --------------------------------------------------
+
+    getAllItems() {
+        return [
+            ...this.gatherCards,
+            ...this.createItemsCards
+        ];
+    }
+
+    getAllCardIds() {
+        return this.allCardData;
+    }
+
+    getAllValues() {
+        return { ...this.values };
+    }
+
+    // Get amount
+    get(id) {
+        return this.values[id] ?? 0;
+    }
+
+    // Set amount
+    set(id, amount) {
+        const newAmount =
+            Math.max(0, amount);
+
+        this.values[id] =
+            newAmount;
+
+        this.sync();
+
+        // StageDiscoveryTracker
+        this.events.emit(
+            'updated',
+            {
+                type: 'item-amount',
+                id,
+                amount: newAmount
+            }
+        );
+
+        return newAmount;
+    }
+
+    // Add amount
+    add(id, amount) {
+        return this.set(
+            id,
+            this.get(id) + amount
+        );
+    }
+
+    // Remove amount
+    remove(id, amount = 1) {
+        if (this.get(id) < amount) {
+            console.warn('Negative deduction detected, stageProgress.remove() cancelled. Item: ' + id + ' Amount: ' + amount);
+            return;
+        }
+        return this.set(
+            id,
+            this.get(id) - amount
+        );
+    }
+
+    getItem(id) {
+        return this.allCardData.find(
+            item => item.id === id
+        ) ?? null;
+    }
+
+    getObjectives() {
+        return this.discoverCards;
+    }
+
+    getItemTitle(id) {
+        const item = this.allCardData.find(i => i.id === id);
+        if (item) return item.title ?? item.id;
+        return null;
+    }
+
+    // UNLOCK
+    getAllUnlocked() {
+        return this.unlocked;
+    }
+    
+    getUnlocked(id) {
+        return this.unlocked[id] === true;
+    }
+    
+    unlock(id, type) {
+        if (this.unlocked[id]) {
+            return;
+        }
+        this.unlocked[id] = true;
+        this.sync();
+        
+        // StageDiscoveryTracker
+        this.events.emit('updated', {
+            id,
+            type: 'item-unlock'
+        });
+    }
+    
+    lock(id, type) {
+        delete this.unlocked[id];
+        this.sync();
+        
+        // StageDiscoveryTracker
+        this.events.emit('updated', {
+            id,
+            type: 'item-unlock'
+        });
+    }
+
+    getTabId(id) {
+        const card = this.allCardData.find(i => i.id === id);
+        return card.tab ?? 'gather';
+    }
+
+//--------------------------------
+// Sync to gameData for saving
+//--------------------------------
+
+    sync() {
+        this.state.sync();
+    }
+
+//--------------------------------
+// Events
+//--------------------------------
+
+    on(event, handler) {
+        this.events.on(event, handler);
+    }
+
+    off(event, handler) {
+        this.events.off(event, handler);
+    }
+
+//--------------------------------
+// STAGE FUNCTIONS
+//--------------------------------
+
+    // For current stage
+    getCurrentStage() {
+        return this.stage;
+    }
+
+    // For objective lookups
+    getCurrentStageId() {
+        const stage = this.stageData.find(s => s.stage === this.gameData.currentStage.stage);
+        if (!stage) return 'creation';
+        return stage.id;
+    }
+
+    setStage(id) {
+        const stage = this.stageData.find(s => s.id === id);
+        if (!stage) {
+            console.warn('setStage() - Stage not found.');
+            return;
+        }
+        this.gameData.currentStage.stage = stage.stage;
+        return stage.title;
+    }
+
+    // or StageUI ??
+    getNextStage() {
+// WIP Cleanup saveData here...
+        gameData.currentStage.stage += 1;
+        const nextStage = this.stageData.find(s => s.stage === gameData.currentStage.stage);
+        this.scene.start(nextStage.scene);
+    }
+
+//--------------------------------
+// Destroy
+//--------------------------------
+
+    destroy() {
+        this.events.removeAllListeners();
+        this.events.destroy();
+    }
+}

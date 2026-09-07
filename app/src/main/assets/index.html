@@ -1,111 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width,
-                   initial-scale=1.0,
-                   maximum-scale=1.0,
-                   user-scalable=no">
-
-    <title>eSim Phaser Test</title>
-
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-        }
-
-        #game {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <title>eSim</title>
+    <script src="./debug/console.js" type="module"></script>
+    <script src="./phaser.js" defer></script>
+    <script src="./main.js" type="module" defer></script>
 </head>
-
 <body>
-
-<div id="game"></div>
-
-<script src="./phaser.min.js"></script>
-
-<script>
-    console.log("Phaser version:", Phaser.VERSION);
-
-    class TestScene extends Phaser.Scene {
-
-        constructor() {
-            super("TestScene");
-        }
-
-        create() {
-
-            const { width, height } = this.scale;
-
-            this.add.text(
-                width / 2,
-                height / 2 - 50,
-                "Phaser Works!",
-                {
-                    fontFamily: "Arial",
-                    fontSize: "48px",
-                    color: "#ffffff"
-                }
-            ).setOrigin(0.5);
-
-            const button = this.add.text(
-                width / 2,
-                height / 2 + 50,
-                "CLICK ME",
-                {
-                    fontFamily: "Arial",
-                    fontSize: "32px",
-                    color: "#00ff00",
-                    backgroundColor: "#222222",
-                    padding: {
-                        left: 20,
-                        right: 20,
-                        top: 10,
-                        bottom: 10
-                    }
-                }
-            )
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true });
-
-            button.on("pointerdown", () => {
-
-                button.setText("PHASER INPUT WORKS!");
-
-                console.log("Phaser pointerdown works!");
-            });
-        }
-    }
-
-    const config = {
-        type: Phaser.AUTO,
-
-        parent: "game",
-
-        width: 360,
-        height: 640,
-
-        backgroundColor: "#111111",
-
-        scale: {
-            mode: Phaser.Scale.RESIZE,
-            autoCenter: Phaser.Scale.CENTER_BOTH
-        },
-
-        scene: TestScene
-    };
-
-    new Phaser.Game(config);
-</script>
-
+<div id="productionErrorLog"></div>
+<div id="consoleLog"></div>
+<div id="debugButtons"></div>
 </body>
 </html>
