@@ -10,71 +10,7 @@ if (DEBUG) {
 }
 */
 
-// window (global) functions
-import('./utils/globalHelpers.js');
-
-/* FIT
-const config = {
-    type: Phaser.AUTO,
-    parent: 'main',
-    scene: [ 
-        BootScene,
-        CreationScene,
-        ConversationScene
-    ],
-    width: 360,
-    height: 640,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-    }
-};
-*/
-
-/* RESIZE
-const config = {
-    type: Phaser.AUTO,
-
-    parent: 'main',
-
-    scene: [
-        BootScene,
-        CreationScene,
-        ConversationScene
-    ],
-
-    width: 360,
-    height: 640,
-
-    scale: {
-        mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-    }
-};
-
-*/
-
-/*
-const config = {
-    parent: 'main',
-    type: Phaser.AUTO,
-    scene: [ 
-        BootScene,
-        CreationScene,
-        ConversationScene
-    ],
-    scale: {
-        mode: Phaser.Scale.FIT, // FIT is good for preserving aspect ratio
-        autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
-        width: 1200,
-        height: 1800
-    }
-};
-
-const game = new Phaser.Game(config);
-*/
-
-const GAME_WIDTH = 1200;
+const GAME_WIDTH = 600;
 
 const aspectRatio = window.innerHeight / window.innerWidth;
 const GAME_HEIGHT = Math.round(GAME_WIDTH * aspectRatio);
