@@ -53,64 +53,51 @@ const config = {
 */
 
 
-const MAX_WIDTH = 1280;
-const MAX_HEIGHT = 1920;
-const HEIGHT_RATIO = 3 / 2;
+// PHASER START
+const MAX_WIDTH = 1280; // Max width for mobile portrait
+const MAX_HEIGHT = 1920; // Max height for mobile portrait
+const ASPECT_RATIO = 3 / 2; // Portrait aspect ratio (adjust as needed)
 
 function getGameSize() {
+    let width = Math.min(window.innerWidth, MAX_WIDTH); // Ensure the width is portrait-friendly
+    let height = Math.min(window.innerHeight, width * ASPECT_RATIO); // Maintain aspect ratio
 
-    const width = Math.min(
-        window.innerWidth,
-        MAX_WIDTH
-    );
-
-    const height = Math.min(
-        window.innerHeight,
-        width * HEIGHT_RATIO
-    );
-
-    return {
-        width,
-        height
-    };
+    return { width, height };
 }
 
 const { width, height } = getGameSize();
 
 const config = {
-
-    type: Phaser.AUTO,
-
     parent: 'main',
-
-    scene: [
+    type: Phaser.AUTO,
+    scene: [ 
         BootScene,
         CreationScene,
         ConversationScene
     ],
-
     scale: {
-
-        mode: Phaser.Scale.FIT,
-
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-
-        width,
-        height,
-
+        mode: Phaser.Scale.FIT, // FIT is good for preserving aspect ratio
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
+        width: width,
+        height: height,
         min: {
-            width: 320,
-            height: 480
+            width: 320, // Minimum width for small devices
+            height: 480 // Minimum height for portrait screens
         },
-
         max: {
-            width: MAX_WIDTH,
-            height: MAX_HEIGHT
+            width: MAX_WIDTH, // Maximum width
+            height: MAX_HEIGHT // Maximum height (portrait-optimized)
         }
     }
 };
 
 const game = new Phaser.Game(config);
+
+// Optional resize handler (may not be necessary if using Phaser's FIT mode)
+/*window.addEventListener("resize", () => {
+    const { width, height } = getGameSize();
+    game.scale.resize(width, height);
+});*/
 
 setTimeout(() => {
 console.log("innerWidth:" + window.innerWidth);
