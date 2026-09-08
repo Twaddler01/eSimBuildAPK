@@ -43,6 +43,9 @@ public class MainActivity extends Activity {
         webView.getSettings().setBuiltInZoomControls(false);
         webView.getSettings().setDisplayZoomControls(false);
 
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLoadWithOverviewMode(false);
+
         WebViewAssetLoader assetLoader =
                 new WebViewAssetLoader.Builder()
                         .addPathHandler(
