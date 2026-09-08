@@ -71,6 +71,17 @@ style.textContent = `
 
 document.head.appendChild(style);
 
+// ==================================================
+// LOG
+// ==================================================
+
+document
+    .getElementById('copyLog')
+    .addEventListener('click', () => {
+
+        
+
+    });
 
 // ==================================================
 // Toggle

@@ -94,18 +94,18 @@ const config = {
 const game = new Phaser.Game(config);
 
 // Optional resize handler (may not be necessary if using Phaser's FIT mode)
-/*window.addEventListener("resize", () => {
+window.addEventListener("resize", () => {
     const { width, height } = getGameSize();
     game.scale.resize(width, height);
-});*/
+});
 
 setTimeout(() => {
 console.log("innerWidth:" + window.innerWidth);
 console.log("innerHeight:" + window.innerHeight);
 console.log("devicePixelRatio:" + window.devicePixelRatio);
-console.log("screen:" + screen.width, screen.height);
-console.log("visualViewport:" +
-    window.visualViewport?.width,
-    + ' ' + window.visualViewport?.height
-);
+console.log("screen width:" + screen.width);
+console.log('screen.height:' + screen.height);
+console.log("visualViewport width:" + window.visualViewport?.width);
+console.log('visualViewport height:' + window.visualViewport?.height);
+
 }, 1000);
