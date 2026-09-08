@@ -54,6 +54,7 @@ const config = {
 
 */
 
+/*
 const config = {
     parent: 'main',
     type: Phaser.AUTO,
@@ -67,6 +68,30 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
         width: 1200,
         height: 1800
+    }
+};
+
+const game = new Phaser.Game(config);
+*/
+
+const GAME_WIDTH = 1200;
+
+const aspectRatio = window.innerHeight / window.innerWidth;
+const GAME_HEIGHT = Math.round(GAME_WIDTH * aspectRatio);
+
+const config = {
+    parent: 'main',
+    type: Phaser.AUTO,
+    scene: [
+        BootScene,
+        CreationScene,
+        ConversationScene
+    ],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: GAME_WIDTH,
+        height: GAME_HEIGHT
     }
 };
 
