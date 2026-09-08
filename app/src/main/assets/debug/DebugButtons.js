@@ -14,7 +14,7 @@ export default class DebugButtons {
         this.container.setDepth(1000);
 
         this.x = 50;
-        this.y = 50;
+        this.y = 150;
 
         this.buttonWidth = 180;
         this.buttonHeight = 40;

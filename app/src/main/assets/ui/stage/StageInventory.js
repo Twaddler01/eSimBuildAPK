@@ -13,6 +13,7 @@ export default class StageInventory {
 
         this.x = options.x ?? 0;
         this.y = options.y ?? 0;
+        this.titleHeight = options.titleHeight ?? 40;
 
         this.width =
             options.width ?? 300;
@@ -45,7 +46,7 @@ export default class StageInventory {
         this.background =
             this.scene.add.rectangle(
                 this.x,
-                this.y,
+                this.y + this.titleHeight + 1,
                 this.width,
                 this.height,
                 0x000055

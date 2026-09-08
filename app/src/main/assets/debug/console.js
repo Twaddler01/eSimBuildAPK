@@ -66,6 +66,7 @@ function startConsole() { // CONSOLE START
  * 		 if it has one.
  */
 
+/*
 document.getElementById('consoleLog').innerHTML = `
     <div style="background-color:#333">
 	<h3 style="margin-bottom: 8px;color:white">Console</h3>
@@ -96,13 +97,111 @@ document.getElementById('consoleLog').innerHTML = `
 		}
 		#js-console .prefix { 
 			display: inline-block;
-			/* display: block; */
+			/* display: block; */ /*
 			min-width: 8em;
 			margin-right: 2em;
 			opacity: 0.66; 
 		}
 	</style>
 `;
+*/
+document.getElementById('consoleLog').innerHTML = `
+    <div class="console-header">
+
+        <span class="console-title">Console</span>
+
+        <button id="productionErrorLogClear">
+            Clear Error
+        </button>
+
+        <button id="consoleClear">
+            Clear
+        </button>
+
+        <button id="consoleRefresh">
+            Reload
+        </button>
+
+        <button id="consoleToggle">
+            Hide
+        </button>
+
+    </div>
+
+    <div class="console-body">
+        <div id="js-console"></div>
+    </div>
+
+    <style>
+        #js-console,
+        #js-console * {
+            box-sizing: border-box;
+        }
+
+        #js-console > div {
+            background-color: #333;
+            color: white;
+            font-family: monospace;
+            padding: 2px 2px;
+            margin-top: -1px;
+        }
+
+        #js-console .log {
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        #js-console .warn {
+            background: yellow;
+            color: black;
+        }
+
+        #js-console .error {
+            background: red;
+        }
+
+        #js-console .prefix {
+            display: inline-block;
+            min-width: 8em;
+            margin-right: 2em;
+            opacity: 0.66;
+        }
+    </style>
+`;
+
+const consoleLog = document.getElementById('consoleLog');
+const consoleToggle = document.getElementById('consoleToggle');
+const consoleRefresh = document.getElementById('consoleRefresh');
+const consoleClear = document.getElementById('consoleClear');
+const productionErrorLogClear = document.getElementById('productionErrorLogClear');
+
+productionErrorLogClear.onclick = () => {
+    document.getElementById('productionErrorLog').innerHTML = '';
+};
+
+consoleClear.onclick = () => {
+    document.getElementById('js-console').innerHTML = '';
+};
+
+consoleToggle.onclick = () => {
+
+    const collapsed = consoleLog.classList.toggle('collapsed');
+
+    consoleToggle.textContent = collapsed
+        ? 'Show'
+        : 'Hide';
+};
+
+consoleRefresh.onclick = () => {
+    location.reload();
+};
+
+
+
+
+
+
+
 
 let consoleDiv = document.getElementById('js-console');
 
@@ -195,10 +294,6 @@ console.render = function(cssClass, items, prefix) {
 		+ items.join('\n');
 	consoleDiv.prepend(div);
 };
-
-console.previewCommand = function(command) {
-
-}
 
 /**
  * Called when a user manually runs some code via the text entry box

@@ -305,6 +305,15 @@ export default class DiscoverCard {
     }
 
     updateTracking() {
+
+console.log(
+    'UPDATE TRACKING...',
+    this.id,
+    this.discoverUI.trackButtonText,
+    this.discoverUI.trackButtonText?.scene,
+    this.discoverUI.trackButtonText?.active
+);
+
         const tracked =
             this.objectivesManager
                 .isObjectiveTracked(this.id);

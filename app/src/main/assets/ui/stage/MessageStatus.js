@@ -15,6 +15,7 @@ export default class MessageStatus {
         this.depth = options.depth ?? 0;
         this.fontSize = options.fontSize ?? '12px';
         this.fontColor = options.fontColor ?? '#fff';
+        this.titleHeight = options.titleHeight ?? 40;
 
         this.messages = [];
 
@@ -40,7 +41,19 @@ export default class MessageStatus {
         )
             .setOrigin(0)
             .setStrokeStyle(1, 0x000000);
-    
+
+        // TITLE
+        const title = addText(this.scene,
+            this.width / 2,
+            this.y - this.titleHeight / 2,
+            'MESSAGES',
+            {
+                fontSize: '24px',
+                color: '#ffffff'
+            }
+        )
+        .setOrigin(0.5, 0.5);
+
         this.msgArea = {
             x: this.x,
             y: this.y,

@@ -10,7 +10,7 @@ if (DEBUG) {
 }
 */
 
-const GAME_WIDTH = 600;
+const GAME_WIDTH = 1200; // 600
 
 const aspectRatio = window.innerHeight / window.innerWidth;
 const GAME_HEIGHT = Math.round(GAME_WIDTH * aspectRatio);

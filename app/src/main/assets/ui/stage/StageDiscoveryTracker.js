@@ -18,6 +18,7 @@ export default class StageDiscoveryTracker {
         this.y = options.y ?? 0;
         this.width = options.width ?? 300;
         this.height = options.height ?? 200;
+        this.titleHeight = options.titleHeight ?? 40;
 
         this.depth =
             this.scene.depths?.tracker ?? 10;
@@ -69,12 +70,34 @@ export default class StageDiscoveryTracker {
     }
 
     create() {
-        this.background =
+        this.titleBg =
             this.scene.add.rectangle(
                 this.x,
                 this.y,
                 this.width,
-                this.height,
+                this.titleHeight,
+                0x000055
+            )
+            .setOrigin(0);
+
+        this.titleText = addText(this.scene,
+            this.x + this.width / 2,
+            this.y + this.titleHeight / 2,
+            'OBJECTIVES TRACKER',
+            {
+                fontSize: '28px',
+                color: '#ffffff'
+            }
+        ).setOrigin(0.5, 0.5);
+
+        // Card padding 
+        const padding = 10;
+        this.background =
+            this.scene.add.rectangle(
+                this.x,
+                this.y + this.titleHeight + 1,
+                this.width,
+                this.height - padding - 1,
                 0x000055
             )
             .setOrigin(0);
@@ -84,9 +107,9 @@ export default class StageDiscoveryTracker {
                 this.scene,
                 {
                     x: this.x,
-                    y: this.y,
+                    y: this.y + this.titleHeight + 1,
                     width: this.width,
-                    height: this.height,
+                    height: this.height - this.titleBg.height - 1 + this.titleHeight - padding - 1,
                     depth: this.depth
                 }
             );

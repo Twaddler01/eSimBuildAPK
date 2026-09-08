@@ -26,14 +26,28 @@ export default class StageUI {
             options.height ??
             scene.scale.height;
 
-        this.headerHeight = 280;
-        this.headerTitleHeight = 40;
-        
-        this.headerBoxX = 10;
-        this.headerBoxY = 10;
-        this.belowHeaderY = 50;
-        this.headerBoxWidth = this.width / 3 - 8;
-        this.headerBoxHeight = this.headerHeight - this.headerTitleHeight;
+        // Where card content starts
+        // Lines up with this.tabHeader_H
+        this.contentMiddleY = this.height / 3;
+
+        // Game header
+        this.margin = 10;
+        this.gameHeader_X = 10;
+        this.gameHeader_Y = 0;
+        this.gameHeader_W = this.width - this.margin * 2; // margin = 10
+        this.gameHeader_H = 150;
+
+//// WIP ////
+        // Top tab area
+        this.tabHeader_X = 
+            this.margin;
+        this.tabHeader_Y = 
+            this.gameHeader_H;
+        this.tabHeader_W = this.width - this.margin * 2;
+        this.tabHeader_H = this.contentMiddleY - this.gameHeader_H - 5; // 230 - 5 (spacing)
+
+        // Under headers starting Y
+        this.belowHeaderY = this.gameHeader_H + this.tabHeader_H + 10;
 
         this.createUI();
     }
@@ -85,35 +99,36 @@ export default class StageUI {
             );
 
         // Inventory
-        this.inventory =
+        /*this.inventory =
             new StageInventory(
                 this.scene,
                 this.stageProgress,
                 {
-                    x: this.headerBoxX + this.headerBoxWidth + 1,
-                    y: this.belowHeaderY + 1,
-                    width: this.headerBoxWidth,
-                    height: this.headerHeight - this.headerTitleHeight - 1,
+                    x: this.tabHeader_X + this.tabHeader_W + 1,
+                    y: this.tabHeader_Y,
+                    width: this.tabHeader_W,
+                    height: this.tabHeader_H + this.tabHeader_H + 1,
+                    titleHeight: this.tabHeader_H
                 }
-            );
+            );*/
 
         // Messages
-        this.messageStatus =
+        /*this.messageStatus =
             new MessageStatus(
                 this.scene,
                 this.scene.gameTimer,
                 this.scene.gameData,
                 {
-                    x: this.headerBoxX,
+                    x: this.tabHeader_X,
                     y: this.belowHeaderY,
-                    width: this.headerBoxWidth,
-                    height: this.headerHeight - this.headerTitleHeight + 1,
+                    width: this.tabHeader_W,
+                    height: this.tabHeader_H - this.tabHeader_H + 1,
                     fontSize: '18px',
                     fontColor: '#33FFE4'
                 }
-            );
+            );*/
 
-        this.messageStatus.addMessageDelayed(
+        this.messageStatus?.addMessageDelayed(
             'Welcome to eSim: Creation Stage!',
             2000
         );
@@ -137,18 +152,14 @@ export default class StageUI {
             this.height -
             navigationHeight -
             margin;
-            
-        //const viewportY = 380; // - 60 on sub
-        this.contentBottomTab = 380;
-        this.contentBottomSub = 320;
-        
+
         const viewportBottom =
             navigationY - 10;
         const viewportHeight =
-            viewportBottom - this.contentBottomTab;
+            viewportBottom - this.contentMiddleY;
         
         // Header for cards
-        this.createCardHeader(margin, this.contentBottomTab);
+        //this.createCardHeader(margin, this.contentMiddleY);
 
         // Initial tab
         this.currentTab = 'gather'; // gather
@@ -160,7 +171,7 @@ export default class StageUI {
                 this.scene,
                 {
                     x: margin,
-                    y: this.contentBottomTab,
+                    y: this.contentMiddleY,
                     width:
                         this.width -
                         margin * 2 - 5,
@@ -208,10 +219,11 @@ export default class StageUI {
         // DISCOVERY TRACKER
         this.discoveryTracker =
             new StageDiscoveryTracker(this.scene, {
-                    x: 10 + this.headerBoxWidth + 1 + this.width / 3 - 8 + 1,
-                    y: 10 + this.headerTitleHeight + 1,
-                    width: this.width / 3 - 7,
-                    height: this.headerHeight - this.headerTitleHeight - 1,
+                    x: this.tabHeader_W + 1 + this.width / 3 - 8,
+                    y: this.tabHeader_Y, // 10 + this.tabHeader_H + 1,
+                    width: this.width / 3,
+                    height: this.tabHeader_H - this.belowHeaderY - 11,
+                    titleHeight: this.tabHeader_H,
                     stageProgress: this.stageProgress,
                     objectivesManager: this.objectivesManager,
                     objectiveFlow: this.objectiveFlow
@@ -224,62 +236,35 @@ export default class StageUI {
 
     // Header
     createHeader() {
+        // Game header
         this.scene.add.rectangle(
-            this.headerBoxX,
-            this.headerBoxY,
-            this.headerBoxWidth,
-            this.headerTitleHeight,
-            0x000055
+            this.gameHeader_X,
+            this.gameHeader_Y,
+            this.gameHeader_W,
+            this.gameHeader_H,
+            0x000000
+        )
+        .setOrigin(0);
+
+        // Tab header
+        this.scene.add.rectangle(
+            this.tabHeader_X,
+            this.tabHeader_Y,
+            this.tabHeader_W,
+            this.tabHeader_H,
+            0x555555
         )
         .setOrigin(0);
 
         this.stageTitleText = addText(this.scene,
-            20,
-            10,
+            this.width / 2,
+            this.gameHeader_H / 2,
             this.stageTitle, // setStage() adds title
             {
-                fontSize: '28px',
+                fontSize: '48px',
                 color: '#ffffff'
             }
-        );
-        
-        this.scene.add.rectangle(
-            this.headerBoxX + this.headerBoxWidth + 1,
-            this.headerBoxY,
-            this.headerBoxWidth,
-            this.headerTitleHeight,
-            0x000055
-        )
-        .setOrigin(0);
-
-        addText(this.scene,
-            this.headerBoxX + this.headerBoxWidth + 80,
-            this.headerTitleHeight / 2 - 2,
-            'INVENTORY',
-            {
-                fontSize: '24px',
-                color: '#ffffff'
-            }
-        );
-        
-        this.scene.add.rectangle(
-            this.headerBoxX + ((this.headerBoxWidth + 1)*2),
-            this.headerBoxY,
-            this.headerBoxWidth,
-            this.headerTitleHeight,
-            0x000055
-        )
-        .setOrigin(0);
-
-        addText(this.scene,
-            this.headerBoxX + (this.headerBoxWidth + 1) * 2 + 40,
-            this.headerTitleHeight / 2 - 2,
-            'DISCOVERY TRACKER',
-            {
-                fontSize: '24px',
-                color: '#ffffff'
-            }
-        );
+        ).setOrigin(0.5, 0.5);
     }
 
     createCardHeader(startX, startY) {
@@ -297,7 +282,7 @@ export default class StageUI {
     // Dynamic viewport
     updateViewportLayout() {
         const viewportY =
-            this.contentBottomTab;
+            this.contentMiddleY;
     
         const viewportBottom =
             this.hasSubNavigation()
