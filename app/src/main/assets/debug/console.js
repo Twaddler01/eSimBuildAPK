@@ -193,7 +193,7 @@ console.render = function(cssClass, items, prefix) {
 	div.innerHTML = 
 		(prefix ? `<span class="prefix">${prefix.htmlEncode()}</span>\n` : '')
 		+ items.join('\n');
-	consoleDiv.appendChild(div);
+	consoleDiv.prepend(div);
 };
 
 console.previewCommand = function(command) {
