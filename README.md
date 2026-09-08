@@ -1,4 +1,4 @@
-eSim WebView Test
+# eSim WebView Test
 
 This is the first Android/WebView project for eSim.
 
@@ -10,7 +10,7 @@ The WebView uses AndroidX "WebViewAssetLoader" to serve the local files through:
 
 This allows the eSim application to continue using ES modules and normal JavaScript imports without requiring an external web server.
 
-Build with GitHub Actions
+## Build with GitHub Actions
 
 This project is intentionally designed so that Gradle does not need to be installed on the Android device.
 
@@ -30,7 +30,7 @@ The GitHub Actions workflow installs/configures:
 
 No local Android Studio or local Gradle installation is required.
 
-WebView Configuration
+## WebView Configuration
 
 The Android app uses a fullscreen WebView configured for the eSim application.
 
@@ -53,7 +53,7 @@ rather than directly loading:
 
 This provides a local HTTPS-like origin for the application's HTML, JavaScript modules, and other assets.
 
-Phaser Scaling
+## Phaser Scaling
 
 The current Phaser configuration uses "Phaser.Scale.FIT".
 
@@ -65,7 +65,7 @@ The logical game height is calculated automatically from the device's aspect rat
 
 This allows the game to maintain its proportions without stretching while providing additional vertical coordinate space on taller devices.
 
-Current eSim UI Work
+## Current eSim UI Work
 
 The existing eSim stage UI originally placed several information panels side-by-side:
 
@@ -85,7 +85,7 @@ This allows each panel to use the full available width while preserving the exis
 
 A small unread indicator may also be added to these tabs so that changes such as new messages, newly acquired items, or objective updates can be indicated when the corresponding panel is not currently selected.
 
-Next Steps
+## Next Steps
 
 - Finish adapting the eSim UI for mobile/WebView viewing.
 - Test the reduced Phaser logical width across devices.
