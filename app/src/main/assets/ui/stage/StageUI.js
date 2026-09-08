@@ -35,7 +35,7 @@ export default class StageUI {
         this.gameHeader_X = 10;
         this.gameHeader_Y = 0;
         this.gameHeader_W = this.width - this.margin * 2; // margin = 10
-        this.gameHeader_H = 150;
+        this.gameHeader_H = 100;
 
 //// WIP ////
         // Top tab area
@@ -97,7 +97,10 @@ export default class StageUI {
                     this.changeSubTab(id);
                 }
             );
-
+        
+        const topTabs_H = 60; // Top tabs navigation
+        this.createTopTabs(topTabs_H);
+        
         // Inventory
         /*this.inventory =
             new StageInventory(
@@ -144,6 +147,15 @@ export default class StageUI {
                     );
                 }
             );
+
+            this.removeTopTabListener =
+                listenToEvent(
+                    this.scene.events,
+                    'stage-top-tab-changed',
+                    id => {
+                        this.changeTopTab(id);
+                    }
+                );
 
         // Viewport
         const margin = 10;
@@ -219,11 +231,11 @@ export default class StageUI {
         // DISCOVERY TRACKER
         this.discoveryTracker =
             new StageDiscoveryTracker(this.scene, {
-                    x: this.tabHeader_W + 1 + this.width / 3 - 8,
-                    y: this.tabHeader_Y, // 10 + this.tabHeader_H + 1,
-                    width: this.width / 3,
-                    height: this.tabHeader_H - this.belowHeaderY - 11,
-                    titleHeight: this.tabHeader_H,
+                    x: 0,
+                    y: this.tabHeader_Y,
+                    width: this.width,
+                    height: this.tabHeader_H,
+                    topTabs_H: topTabs_H,
                     stageProgress: this.stageProgress,
                     objectivesManager: this.objectivesManager,
                     objectiveFlow: this.objectiveFlow
@@ -247,14 +259,16 @@ export default class StageUI {
         .setOrigin(0);
 
         // Tab header
-        this.scene.add.rectangle(
+        const tabHeaderBG = this.scene.add.rectangle(
             this.tabHeader_X,
             this.tabHeader_Y,
             this.tabHeader_W,
             this.tabHeader_H,
             0x555555
         )
+        .setVisible(false)
         .setOrigin(0);
+        this.scene.children.sendToBack(tabHeaderBG);
 
         this.stageTitleText = addText(this.scene,
             this.width / 2,
@@ -266,6 +280,125 @@ export default class StageUI {
             }
         ).setOrigin(0.5, 0.5);
     }
+
+createTopTabs(topTabs_H) {
+
+    const topTabs_X = this.margin;
+    const topTabs_Y = this.tabHeader_Y;
+    const topTabs_W = this.width - this.margin * 2;
+
+    const tabs = [
+        {
+            id: 'discover',
+            title: 'DISCOVER'
+        },
+        {
+            id: 'inventory',
+            title: 'INVENTORY'
+        }
+    ];
+
+    this.topTabs = [];
+
+    const tabWidth = topTabs_W / tabs.length;
+
+    tabs.forEach((tab, index) => {
+
+        const x = topTabs_X + index * tabWidth;
+
+        // Tab background
+        const background =
+            this.scene.add.rectangle(
+                x,
+                topTabs_Y,
+                tabWidth - 2,
+                topTabs_H,
+                0x222222
+            )
+            .setOrigin(0);
+
+        // Selected highlight
+        const highlight =
+            this.scene.add.rectangle(
+                x,
+                topTabs_Y + topTabs_H - 5,
+                tabWidth - 2,
+                5,
+                0x33FFE4
+            )
+            .setOrigin(0);
+
+        // Text
+        const text =
+            addText(
+                this.scene,
+                x + (tabWidth - 2) / 2,
+                topTabs_Y + topTabs_H / 2,
+                tab.title,
+                {
+                    fontSize: '22px',
+                    color: '#aaaaaa'
+                }
+            )
+            .setOrigin(0.5);
+
+        background.setInteractive();
+
+        background.on('pointerdown', () => {
+
+            this.scene.events.emit(
+                'stage-top-tab-changed',
+                tab.id
+            );
+
+        });
+
+        this.topTabs.push({
+            id: tab.id,
+            background,
+            highlight,
+            text
+        });
+    });
+
+    this.currentTopTab = 'discover';
+
+    this.updateTopTabs();
+}
+
+updateTopTabs() {
+    this.topTabs.forEach(tab => {
+
+        const selected =
+            tab.id === this.currentTopTab;
+
+        tab.background.setFillStyle(
+            selected
+                ? 0x333333
+                : 0x222222
+        );
+
+        tab.highlight.setVisible(selected);
+
+        tab.text.setColor(
+            selected
+                ? '#33FFE4'
+                : '#aaaaaa'
+        );
+    });
+}
+
+changeTopTab(id) {
+    if (this.currentTopTab === id) {
+        return;
+    }
+
+    this.currentTopTab = id;
+
+    this.updateTopTabs();
+
+    // Content handling later
+}
 
     createCardHeader(startX, startY) {
         const padding = 10;
@@ -475,6 +608,7 @@ export default class StageUI {
         this.removeTabListener?.();
         this.removeSubTabListener?.();
         this.removeConversationListener?.();
+        this.removeTopTabListener?.();
 
         this.inventory?.destroy();
         this.viewport?.destroy();

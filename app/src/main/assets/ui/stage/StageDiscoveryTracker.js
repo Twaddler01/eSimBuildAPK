@@ -18,7 +18,7 @@ export default class StageDiscoveryTracker {
         this.y = options.y ?? 0;
         this.width = options.width ?? 300;
         this.height = options.height ?? 200;
-        this.titleHeight = options.titleHeight ?? 40;
+        this.topTabs_H = options.topTabs_H ?? 40;
 
         this.depth =
             this.scene.depths?.tracker ?? 10;
@@ -70,46 +70,71 @@ export default class StageDiscoveryTracker {
     }
 
     create() {
-        this.titleBg =
-            this.scene.add.rectangle(
-                this.x,
-                this.y,
-                this.width,
-                this.titleHeight,
-                0x000055
-            )
-            .setOrigin(0);
-
-        this.titleText = addText(this.scene,
-            this.x + this.width / 2,
-            this.y + this.titleHeight / 2,
-            'OBJECTIVES TRACKER',
-            {
-                fontSize: '28px',
-                color: '#ffffff'
-            }
-        ).setOrigin(0.5, 0.5);
 
         // Card padding 
-        const padding = 10;
         this.background =
             this.scene.add.rectangle(
                 this.x,
-                this.y + this.titleHeight + 1,
+                this.y + this.topTabs_H + 1,
                 this.width,
-                this.height - padding - 1,
+                this.height - this.topTabs_H,
                 0x000055
             )
             .setOrigin(0);
+
+const screenY = this.y + this.topTabs_H + 1;
+const screenH = this.height - this.topTabs_H;
+
+this.vignette = this.scene.add.graphics();
+
+const fadeSize = 28;
+const steps = 12;
+
+// Top fade
+for (let i = 0; i < steps; i++) {
+
+    const progress = i / steps;
+    const alpha = 0.35 * (1 - progress);
+
+    this.vignette.fillStyle(0x999999, alpha);
+
+    this.vignette.fillRect(
+        this.x,
+        screenY + i * (fadeSize / steps),
+        this.width,
+        fadeSize / steps
+    );
+}
+
+// Bottom fade
+for (let i = 0; i < steps; i++) {
+
+    const progress = i / steps;
+    const alpha = 0.35 * progress;
+
+    this.vignette.fillStyle(0x999999, alpha);
+
+    this.vignette.fillRect(
+        this.x,
+        screenY + screenH - fadeSize + i * (fadeSize / steps),
+        this.width,
+        fadeSize / steps
+    );
+}
+
+
+
+
+
 
         this.scrollBox =
             new ScrollBox(
                 this.scene,
                 {
                     x: this.x,
-                    y: this.y + this.titleHeight + 1,
+                    y: this.y + this.topTabs_H + 10,
                     width: this.width,
-                    height: this.height - this.titleBg.height - 1 + this.titleHeight - padding - 1,
+                    height: this.height - this.topTabs_H - 20,
                     depth: this.depth
                 }
             );
@@ -155,9 +180,9 @@ export default class StageDiscoveryTracker {
                         new TrackerCard(
                             this.scene,
                             {
-                                x: this.x + 10,
+                                x: this.x + 25,
                                 y: 0,
-                                width: this.width - 20,
+                                width: this.width - 50,
     
                                 objective,
     
@@ -286,9 +311,9 @@ export default class StageDiscoveryTracker {
                     new TrackerCard(
                         this.scene,
                         {
-                            x: this.x + 10,
+                            x: this.x + 25,
                             y,
-                            width: this.width - 20,
+                            width: this.width - 50,
     
                             objective,
     
