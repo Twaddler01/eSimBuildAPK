@@ -102,7 +102,7 @@ export default class StageUI {
         this.createTopTabs(topTabs_H);
         
         // Inventory
-        /*this.inventory =
+        this.inventory =
             new StageInventory(
                 this.scene,
                 this.stageProgress,
@@ -113,10 +113,10 @@ export default class StageUI {
                     height: this.tabHeader_H + this.tabHeader_H + 1,
                     titleHeight: this.tabHeader_H
                 }
-            );*/
+            );
 
         // Messages
-        /*this.messageStatus =
+        this.messageStatus =
             new MessageStatus(
                 this.scene,
                 this.scene.gameTimer,
@@ -129,12 +129,12 @@ export default class StageUI {
                     fontSize: '18px',
                     fontColor: '#33FFE4'
                 }
-            );*/
+            );
 
-        this.messageStatus?.addMessageDelayed(
+        /*this.messageStatus?.addMessageDelayed(
             'Welcome to eSim: Creation Stage!',
             2000
-        );
+        );*/
 
         // Insert messages from conversations
         this.removeConversationListener =
