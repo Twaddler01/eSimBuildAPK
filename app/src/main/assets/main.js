@@ -11,7 +11,7 @@ if (DEBUG) {
 // window (global) functions
 import('./utils/globalHelpers.js');
 
-/*
+/* FIT
 const config = {
     type: Phaser.AUTO,
     parent: 'main',
@@ -29,6 +29,7 @@ const config = {
 };
 */
 
+/* RESIZE
 const config = {
     type: Phaser.AUTO,
 
@@ -49,13 +50,75 @@ const config = {
     }
 };
 
+*/
+
+
+const MAX_WIDTH = 1280;
+const MAX_HEIGHT = 1920;
+const HEIGHT_RATIO = 3 / 2;
+
+function getGameSize() {
+
+    const width = Math.min(
+        window.innerWidth,
+        MAX_WIDTH
+    );
+
+    const height = Math.min(
+        window.innerHeight,
+        width * HEIGHT_RATIO
+    );
+
+    return {
+        width,
+        height
+    };
+}
+
+const { width, height } = getGameSize();
+
+const config = {
+
+    type: Phaser.AUTO,
+
+    parent: 'main',
+
+    scene: [
+        BootScene,
+        CreationScene,
+        ConversationScene
+    ],
+
+    scale: {
+
+        mode: Phaser.Scale.FIT,
+
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+
+        width,
+        height,
+
+        min: {
+            width: 320,
+            height: 480
+        },
+
+        max: {
+            width: MAX_WIDTH,
+            height: MAX_HEIGHT
+        }
+    }
+};
+
 const game = new Phaser.Game(config);
 
 setTimeout(() => {
-    console.log('Phaser game...', game);
-    console.log('Scale:' + game.scale.width + ' ' + game.scale.height);
-    console.log('Canvas:'); // + game.canvas);
-    console.log(game.canvas);
-    console.log('Canvas size:' + game.canvas?.width + ' ' + game.canvas?.height);
-    console.log('Canvas CSS:' + game.canvas?.style.cssText);
+console.log("innerWidth:" + window.innerWidth);
+console.log("innerHeight:" + window.innerHeight);
+console.log("devicePixelRatio:" + window.devicePixelRatio);
+console.log("screen:" + screen.width, screen.height);
+console.log("visualViewport:" +
+    window.visualViewport?.width,
+    + ' ' + window.visualViewport?.height
+);
 }, 1000);
