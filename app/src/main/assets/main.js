@@ -76,7 +76,7 @@ const config = {
         ConversationScene
     ],
     scale: {
-        mode: Phaser.Scale.FIT, // FIT is good for preserving aspect ratio
+        mode: Phaser.Scale.RESIZE, // FIT is good for preserving aspect ratio
         autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
         width: width,
         height: height,
