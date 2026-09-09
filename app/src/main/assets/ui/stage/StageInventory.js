@@ -13,7 +13,6 @@ export default class StageInventory {
 
         this.x = options.x ?? 0;
         this.y = options.y ?? 0;
-        this.titleHeight = options.titleHeight ?? 40;
 
         this.width =
             options.width ?? 300;
@@ -21,9 +20,14 @@ export default class StageInventory {
         this.height =
             options.height ?? 200;
 
-        this.depth =
-            this.scene.depths?.inventory ?? 10;
+        this.scene.depths?.topTabs ?? 10;
 
+        this.container =
+            this.scene.add.container(0, 0);
+        
+        this.container.setDepth(this.depth);
+        
+        this.elements = [];
         this.items = [];
 
         this.create();
@@ -43,28 +47,24 @@ export default class StageInventory {
     }
 
     create() {
-        this.background =
+        /*this.background =
             this.scene.add.rectangle(
                 this.x,
-                this.y + this.titleHeight + 1,
+                this.y,
                 this.width,
                 this.height,
                 0x000055
             )
-            .setOrigin(0);
-    
-        this.background.setDepth(
-            this.depth
-        );
+            .setOrigin(0);*/
     
         this.scrollBox =
             new ScrollBox(
                 this.scene,
                 {
-                    x: this.x,
-                    y: this.y,
-                    width: this.width,
-                    height: this.height,
+                    x: this.x + 20,
+                    y: this.y + 20,
+                    width: this.width - 40,
+                    height: this.height - 40,
                     depth: this.depth,
                     maskPadding: 3
                 }
@@ -72,6 +72,8 @@ export default class StageInventory {
     
         this.content =
             this.scrollBox.content;
+        
+        this.addElement(this.content);
     }
 
     // Category colors
@@ -207,27 +209,51 @@ export default class StageInventory {
 
         return items;
     }
+    
+    // For tabs (StageUI)
+    setVisible(visible) {
+        this.container.setVisible(visible);
+    
+        if (this.scrollBox?.scrollZone) {
+            this.scrollBox.scrollZone.input.enabled =
+                visible;
+        }
+    }
+
+    // ELEMENT HELPERS
+    addElement(element) {
+        this.elements.push(element);
+        this.container.add(element);
+        return element;
+    }
 
     // Destroy
     destroy() {
         this.removeProgressListener?.();
-
+    
         if (this.scene && this._tabChangedHandler) {
             this.scene.events.off(
                 'stage-tab-changed',
                 this._tabChangedHandler
             );
         }
-
-        this.scrollZone?.destroy();
-        this.content?.destroy();
-        this.background?.destroy();
-        this.title?.destroy();
-
+    
+        if (this.scrollBox?.content) {
+            this.container?.remove(
+                this.scrollBox.content
+            );
+        }
+    
+        this.scrollBox?.destroy();
+    
+        this.container?.destroy();
+    
         this.items = [];
-
+        this.elements = [];
+    
+        this.scrollBox = null;
         this.content = null;
         this.background = null;
-        this.title = null;
+        this.container = null;
     }
 }

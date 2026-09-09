@@ -32,6 +32,7 @@ export default class CreationScene extends Phaser.Scene {
             background: 0,
             viewport: 10,
             inventory: 10,
+            topTabs: 20,
             cards: 20,
             messages: 50,
             navigation: 100

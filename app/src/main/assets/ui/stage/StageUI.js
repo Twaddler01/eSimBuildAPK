@@ -46,6 +46,14 @@ export default class StageUI {
         this.tabHeader_W = this.width - this.margin * 2;
         this.tabHeader_H = this.contentMiddleY - this.gameHeader_H - 5; // 230 - 5 (spacing)
 
+        this.topTabs_H = 60; // Top tabs navigation
+        
+        // Tab content area this.topTabsContent
+        this.topTabsContent_X = 0;
+        this.topTabsContent_Y = this.tabHeader_Y + this.topTabs_H + 1;
+        this.topTabsContent_W = this.width;
+        this.topTabsContent_H = this.tabHeader_H - this.topTabs_H;
+
         // Under headers starting Y
         this.belowHeaderY = this.gameHeader_H + this.tabHeader_H + 10;
 
@@ -59,6 +67,8 @@ export default class StageUI {
 
         // Header
         this.createHeader();
+        // Top tabs effect
+        this.createTopTabsContentBackground();
 
         // Listen for changes
         this.removeProgressListener =
@@ -97,44 +107,42 @@ export default class StageUI {
                     this.changeSubTab(id);
                 }
             );
-        
-        const topTabs_H = 60; // Top tabs navigation
-        this.createTopTabs(topTabs_H);
-        
+
+        this.createTopTabs();
+
         // Inventory
         this.inventory =
             new StageInventory(
                 this.scene,
                 this.stageProgress,
                 {
-                    x: this.tabHeader_X + this.tabHeader_W + 1,
-                    y: this.tabHeader_Y,
-                    width: this.tabHeader_W,
-                    height: this.tabHeader_H + this.tabHeader_H + 1,
-                    titleHeight: this.tabHeader_H
+                    x: this.topTabsContent_X,
+                    y: this.topTabsContent_Y,
+                    width: this.topTabsContent_W,
+                    height: this.topTabsContent_H
                 }
             );
 
         // Messages
-        this.messageStatus =
+        /*this.messageStatus =
             new MessageStatus(
                 this.scene,
                 this.scene.gameTimer,
                 this.scene.gameData,
                 {
-                    x: this.tabHeader_X,
-                    y: this.belowHeaderY,
-                    width: this.tabHeader_W,
-                    height: this.tabHeader_H - this.tabHeader_H + 1,
+                    x: this.topTabsContent_X,
+                    y: this.topTabsContent_Y,
+                    width: this.topTabsContent_W,
+                    height: this.topTabsContent_H,
                     fontSize: '18px',
                     fontColor: '#33FFE4'
                 }
-            );
+            );*/
 
         /*this.messageStatus?.addMessageDelayed(
             'Welcome to eSim: Creation Stage!',
             2000
-        );*/
+        );
 
         // Insert messages from conversations
         this.removeConversationListener =
@@ -146,7 +154,7 @@ export default class StageUI {
                         `${message.speaker}: ${message.text}`
                     );
                 }
-            );
+            );*/
 
             this.removeTopTabListener =
                 listenToEvent(
@@ -170,9 +178,6 @@ export default class StageUI {
         const viewportHeight =
             viewportBottom - this.contentMiddleY;
         
-        // Header for cards
-        //this.createCardHeader(margin, this.contentMiddleY);
-
         // Initial tab
         this.currentTab = 'gather'; // gather
         // Initial sub Tab
@@ -231,44 +236,33 @@ export default class StageUI {
         // DISCOVERY TRACKER
         this.discoveryTracker =
             new StageDiscoveryTracker(this.scene, {
-                    x: 0,
-                    y: this.tabHeader_Y,
-                    width: this.width,
-                    height: this.tabHeader_H,
-                    topTabs_H: topTabs_H,
+                    x: this.topTabsContent_X,
+                    y: this.topTabsContent_Y,
+                    width: this.topTabsContent_W,
+                    height: this.topTabsContent_H,
                     stageProgress: this.stageProgress,
                     objectivesManager: this.objectivesManager,
                     objectiveFlow: this.objectiveFlow
                 }
             );
 
+        this.updateTopTabContent();
         this.refreshCurrentTab();
 
     }
 
     // Header
     createHeader() {
-        // Game header
-        this.scene.add.rectangle(
+        // Game header (PLACEHOLDER)
+        this.gameHeaderBG = this.scene.add.rectangle(
             this.gameHeader_X,
             this.gameHeader_Y,
             this.gameHeader_W,
             this.gameHeader_H,
-            0x000000
-        )
-        .setOrigin(0);
-
-        // Tab header
-        const tabHeaderBG = this.scene.add.rectangle(
-            this.tabHeader_X,
-            this.tabHeader_Y,
-            this.tabHeader_W,
-            this.tabHeader_H,
-            0x555555
+            0xffffff
         )
         .setVisible(false)
         .setOrigin(0);
-        this.scene.children.sendToBack(tabHeaderBG);
 
         this.stageTitleText = addText(this.scene,
             this.width / 2,
@@ -279,137 +273,209 @@ export default class StageUI {
                 color: '#ffffff'
             }
         ).setOrigin(0.5, 0.5);
-    }
 
-createTopTabs(topTabs_H) {
-
-    const topTabs_X = this.margin;
-    const topTabs_Y = this.tabHeader_Y;
-    const topTabs_W = this.width - this.margin * 2;
-
-    const tabs = [
-        {
-            id: 'discover',
-            title: 'DISCOVER'
-        },
-        {
-            id: 'inventory',
-            title: 'INVENTORY'
-        }
-    ];
-
-    this.topTabs = [];
-
-    const tabWidth = topTabs_W / tabs.length;
-
-    tabs.forEach((tab, index) => {
-
-        const x = topTabs_X + index * tabWidth;
-
-        // Tab background
-        const background =
-            this.scene.add.rectangle(
-                x,
-                topTabs_Y,
-                tabWidth - 2,
-                topTabs_H,
-                0x222222
-            )
-            .setOrigin(0);
-
-        // Selected highlight
-        const highlight =
-            this.scene.add.rectangle(
-                x,
-                topTabs_Y + topTabs_H - 5,
-                tabWidth - 2,
-                5,
-                0x33FFE4
-            )
-            .setOrigin(0);
-
-        // Text
-        const text =
-            addText(
-                this.scene,
-                x + (tabWidth - 2) / 2,
-                topTabs_Y + topTabs_H / 2,
-                tab.title,
-                {
-                    fontSize: '22px',
-                    color: '#aaaaaa'
-                }
-            )
-            .setOrigin(0.5);
-
-        background.setInteractive();
-
-        background.on('pointerdown', () => {
-
-            this.scene.events.emit(
-                'stage-top-tab-changed',
-                tab.id
-            );
-
-        });
-
-        this.topTabs.push({
-            id: tab.id,
-            background,
-            highlight,
-            text
-        });
-    });
-
-    this.currentTopTab = 'discover';
-
-    this.updateTopTabs();
-}
-
-updateTopTabs() {
-    this.topTabs.forEach(tab => {
-
-        const selected =
-            tab.id === this.currentTopTab;
-
-        tab.background.setFillStyle(
-            selected
-                ? 0x333333
-                : 0x222222
-        );
-
-        tab.highlight.setVisible(selected);
-
-        tab.text.setColor(
-            selected
-                ? '#33FFE4'
-                : '#aaaaaa'
-        );
-    });
-}
-
-changeTopTab(id) {
-    if (this.currentTopTab === id) {
-        return;
-    }
-
-    this.currentTopTab = id;
-
-    this.updateTopTabs();
-
-    // Content handling later
-}
-
-    createCardHeader(startX, startY) {
-        const padding = 10;
-        this.scene.add.rectangle(
-            startX + 6,
-            startY - 80,
-            this.width - padding * 2 - 6,
-            80 - padding,
-            0x444444
+        // Tab header (PLACEHOLDER)
+        this.tabHeaderBG = this.scene.add.rectangle(
+            this.tabHeader_X,
+            this.tabHeader_Y,
+            this.tabHeader_W,
+            this.tabHeader_H,
+            0xffffff
         )
+        .setVisible(false)
         .setOrigin(0);
+        //this.scene.children.sendToBack(tabHeaderBG);
+        //this.scene.children.bringToTop(tabHeaderBG);
+
+        // Tab content area (PLACEHOLDER)
+        this.topTabsContent = this.scene.add.rectangle(
+            this.topTabsContent_X,
+            this.topTabsContent_Y,
+            this.topTabsContent_W,
+            this.topTabsContent_H,
+            0xffffff
+        )
+        .setVisible(false)
+        .setOrigin(0);
+    }
+
+    createTopTabsContentBackground() {
+        const screenY = this.topTabsContent_Y;
+        const screenH = this.topTabsContent_H;
+    
+        this.topTabsContentGradient =
+            this.scene.add.graphics();
+    
+        const fadeSize = 28;
+        const steps = 12;
+    
+        // Top fade
+        for (let i = 0; i < steps; i++) {
+    
+            const progress = i / steps;
+            const alpha = 0.35 * (1 - progress);
+    
+            this.topTabsContentGradient.fillStyle(
+                0x999999,
+                alpha
+            );
+    
+            this.topTabsContentGradient.fillRect(
+                this.topTabsContent_X,
+                screenY + i * (fadeSize / steps),
+                this.topTabsContent_W,
+                fadeSize / steps
+            );
+        }
+    
+        // Bottom fade
+        for (let i = 0; i < steps; i++) {
+    
+            const progress = i / steps;
+            const alpha = 0.35 * progress;
+    
+            this.topTabsContentGradient.fillStyle(
+                0x999999,
+                alpha
+            );
+    
+            this.topTabsContentGradient.fillRect(
+                this.topTabsContent_X,
+                screenY +
+                    screenH -
+                    fadeSize +
+                    i * (fadeSize / steps),
+                this.topTabsContent_W,
+                fadeSize / steps
+            );
+        }
+    }
+
+    createTopTabs() {
+        const topTabs_X = this.margin;
+        const topTabs_Y = this.tabHeader_Y;
+        const topTabs_W = this.width - this.margin * 2;
+    
+        const tabs = [
+            {
+                id: 'objectives',
+                title: 'OBJECTIVES'
+            },
+            {
+                id: 'inventory',
+                title: 'INVENTORY'
+            }
+        ];
+    
+        this.topTabs = [];
+    
+        const tabWidth = topTabs_W / tabs.length;
+    
+        tabs.forEach((tab, index) => {
+    
+            const x = topTabs_X + index * tabWidth;
+    
+            // Tab background
+            const background =
+                this.scene.add.rectangle(
+                    x,
+                    topTabs_Y,
+                    tabWidth - 2,
+                    this.topTabs_H,
+                    0x222222
+                )
+                .setOrigin(0);
+    
+            // Selected highlight
+            const highlight =
+                this.scene.add.rectangle(
+                    x,
+                    topTabs_Y + this.topTabs_H - 5,
+                    tabWidth - 2,
+                    5,
+                    0x33FFE4
+                )
+                .setOrigin(0);
+    
+            // Text
+            const text =
+                addText(
+                    this.scene,
+                    x + (tabWidth - 2) / 2,
+                    topTabs_Y + this.topTabs_H / 2,
+                    tab.title,
+                    {
+                        fontSize: '22px',
+                        color: '#aaaaaa'
+                    }
+                )
+                .setOrigin(0.5);
+    
+            background.setInteractive();
+    
+            background.on('pointerdown', () => {
+    
+                this.scene.events.emit(
+                    'stage-top-tab-changed',
+                    tab.id
+                );
+    
+            });
+    
+            this.topTabs.push({
+                id: tab.id,
+                background,
+                highlight,
+                text
+            });
+        });
+    
+        this.currentTopTab = 'objectives';
+    
+        this.updateTopTabs();
+    }
+    
+    updateTopTabs() {
+        this.topTabs.forEach(tab => {
+    
+            const selected =
+                tab.id === this.currentTopTab;
+    
+            tab.background.setFillStyle(
+                selected
+                    ? 0x333333
+                    : 0x222222
+            );
+    
+            tab.highlight.setVisible(selected);
+    
+            tab.text.setColor(
+                selected
+                    ? '#33FFE4'
+                    : '#aaaaaa'
+            );
+        });
+    }
+    
+    changeTopTab(id) {
+        if (this.currentTopTab === id) {
+            return;
+        }
+    
+        this.currentTopTab = id;
+    
+        this.updateTopTabs();
+        this.updateTopTabContent();
+    }
+
+    updateTopTabContent() {
+        this.discoveryTracker?.setVisible(
+            this.currentTopTab === 'objectives'
+        );
+    
+        this.inventory?.setVisible(
+            this.currentTopTab === 'inventory'
+        );
     }
 
     // Dynamic viewport

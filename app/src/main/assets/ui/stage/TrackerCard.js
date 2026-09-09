@@ -291,13 +291,13 @@ export default class TrackerCard {
         this.completeButton =
             this.addElement(
                 this.scene.add.rectangle(
-                    10,
+                    this.width / 2,
                     currentY,
-                    this.width - 20,
+                    200,
                     34,
                     0x335533
                 )
-                .setOrigin(0)
+                .setOrigin(0.5, 0)
                 .setStrokeStyle(
                     1,
                     0x66aa66

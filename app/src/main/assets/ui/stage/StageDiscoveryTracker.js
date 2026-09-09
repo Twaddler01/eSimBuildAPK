@@ -18,11 +18,15 @@ export default class StageDiscoveryTracker {
         this.y = options.y ?? 0;
         this.width = options.width ?? 300;
         this.height = options.height ?? 200;
-        this.topTabs_H = options.topTabs_H ?? 40;
 
         this.depth =
-            this.scene.depths?.tracker ?? 10;
-        
+            this.scene.depths?.topTabs ?? 10;
+        this.container =
+            this.scene.add.container(0, 0);
+        this.container.setDepth(this.depth);
+
+        this.elements = [];
+
         this.removeProgressListener =
             listenToEvent(
                 this.stageProgress,
@@ -72,72 +76,76 @@ export default class StageDiscoveryTracker {
     create() {
 
         // Card padding 
-        this.background =
+        /*this.background =
+            this.addElement(
             this.scene.add.rectangle(
                 this.x,
-                this.y + this.topTabs_H + 1,
+                this.y,
                 this.width,
-                this.height - this.topTabs_H,
+                this.height,
                 0x000055
             )
-            .setOrigin(0);
+            .setOrigin(0)
+        );*/
 
-const screenY = this.y + this.topTabs_H + 1;
-const screenH = this.height - this.topTabs_H;
-
-this.vignette = this.scene.add.graphics();
-
-const fadeSize = 28;
-const steps = 12;
-
-// Top fade
-for (let i = 0; i < steps; i++) {
-
-    const progress = i / steps;
-    const alpha = 0.35 * (1 - progress);
-
-    this.vignette.fillStyle(0x999999, alpha);
-
-    this.vignette.fillRect(
-        this.x,
-        screenY + i * (fadeSize / steps),
-        this.width,
-        fadeSize / steps
-    );
-}
-
-// Bottom fade
-for (let i = 0; i < steps; i++) {
-
-    const progress = i / steps;
-    const alpha = 0.35 * progress;
-
-    this.vignette.fillStyle(0x999999, alpha);
-
-    this.vignette.fillRect(
-        this.x,
-        screenY + screenH - fadeSize + i * (fadeSize / steps),
-        this.width,
-        fadeSize / steps
-    );
-}
-
-
-
-
-
+        // Gradient
+        const screenY = this.y;
+        const screenH = this.height;
+        
+        this.vignette = this.addElement(
+            this.scene.add.graphics()
+        );
+        
+        const fadeSize = 28;
+        const steps = 12;
+        
+        // Top fade
+        for (let i = 0; i < steps; i++) {
+        
+            const progress = i / steps;
+            const alpha = 0.35 * (1 - progress);
+        
+            this.vignette.fillStyle(0x999999, alpha);
+        
+            this.vignette.fillRect(
+                this.x,
+                screenY + i * (fadeSize / steps),
+                this.width,
+                fadeSize / steps
+            );
+        }
+        
+        // Bottom fade
+        for (let i = 0; i < steps; i++) {
+        
+            const progress = i / steps;
+            const alpha = 0.35 * progress;
+        
+            this.vignette.fillStyle(0x999999, alpha);
+        
+            this.vignette.fillRect(
+                this.x,
+                screenY + screenH - fadeSize + i * (fadeSize / steps),
+                this.width,
+                fadeSize / steps
+            );
+        }
 
         this.scrollBox =
             new ScrollBox(
                 this.scene,
                 {
                     x: this.x,
-                    y: this.y + this.topTabs_H + 10,
+                    y: this.y + 28,
                     width: this.width,
-                    height: this.height - this.topTabs_H - 20,
+                    height: this.height - 28*2,
                     depth: this.depth
                 }
             );
+            
+        this.addElement(
+            this.scrollBox.content
+        );
     }
 
     syncObjectives() {
@@ -384,23 +392,44 @@ for (let i = 0; i < steps; i++) {
         );
     }
 
+    // ELEMENT HELPERS
+    addElement(element) {
+        this.elements.push(element);
+        this.container.add(element);
+        return element;
+    }
+
+    // For tabs (StageUI)
+    setVisible(visible) {
+        this.container.setVisible(visible);
+    
+        if (this.scrollBox?.scrollZone) {
+            this.scrollBox.scrollZone.input.enabled =
+                visible;
+        }
+    }
+
     destroy() {
         this.removeProgressListener?.();
         this.removeObjectiveListener?.();
         this.removeFlowListener?.();
-
+    
         this.objectives.forEach(
             card => card.destroy?.()
         );
     
         this.objectives = [];
     
-        this.background?.destroy();
         this.scrollBox?.destroy();
-        
-        this.emptyText?.destroy();
+    
+        this.container?.destroy();
+    
+        this.elements = [];
     
         this.background = null;
+        this.vignette = null;
         this.scrollBox = null;
+        this.emptyText = null;
+        this.container = null;
     }
 }
