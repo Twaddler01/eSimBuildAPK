@@ -53,6 +53,7 @@ export default class DiscoverCard {
             this.onAction?.();
         };
 
+        this.destroyed = false;
         this.elements = [];
         this.discoverUI = {};
 
@@ -305,11 +306,10 @@ export default class DiscoverCard {
     }
 
     updateTracking() {
-
-// WIP DEBUG FIX
-        if (!this.discoverUI.trackButtonText?.scene) {
-            return;
-        }
+        // updateTracking
+        if (this.destroyed) return;
+        if (!this.objectivesManager) return;
+        if (!this.discoverUI.trackButtonText?.scene) return;
 
         const tracked =
             this.objectivesManager
@@ -334,9 +334,6 @@ export default class DiscoverCard {
                 ? 'UNTRACK'
                 : 'TRACK'
         );
-        
-        const strokeStyleW = tracked ? 5: 1;
-        const strokeStyleC = tracked ? 0x44aa44: 0xffffff;
 
         this.updateDiscoverOverlay({
             tracked
@@ -481,10 +478,9 @@ export default class DiscoverCard {
         if (canTrack) {
             this.updateTracking();
         }
-    
-        // Reset
+
+        // RESET / DEFAULT VISIBILITY
         this.updateLockUI(false);
-        this.discoverUI.availabilityTitle?.setVisible(false);
 
         // Discover updates
         const requireText = state === 'completed' ? 'Required:' : 'Requires:';
@@ -523,13 +519,24 @@ export default class DiscoverCard {
 
     // DESTROY
     destroy() {
+        if (this.destroyed) {
+            return;
+        }
+    
+        this.destroyed = true;
+    
         this.removeObjectiveListener?.();
-        
+        this.removeObjectiveListener = null;
+    
         this.elements.forEach(
             element => element.destroy()
         );
+    
         this.elements = [];
+    
         this.container?.destroy();
+        this.container = null;
+    
         this.discoverUI = {};
     }
 }

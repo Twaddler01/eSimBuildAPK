@@ -324,6 +324,9 @@ export default class StageCard {
     updateLockUI(locked) {
         this.ui.lockOverlay?.setVisible(locked);
         this.ui.availabilityText?.setVisible(locked);
+        if (locked) {
+            this.ui.availabilityTitle?.setVisible(false);
+        }
     }
     
     updateDiscoverOverlay(data) {
@@ -339,9 +342,6 @@ export default class StageCard {
         if (data.unlockText !== undefined) {
             this.ui.unlockTitle?.setText(data.unlockText);
         }
-        
-        // RESET
-        this.ui.availabilityTitle?.setVisible(false);
 
         // availabilityText
         if (data.availabilityText?.state === 'active') {
@@ -351,7 +351,9 @@ export default class StageCard {
         if (data.availabilityText?.state === 'completed') {
             this.ui.availabilityTitle?.setVisible(true);
             this.ui.availabilityText?.setVisible(true).setText('COMPLETED');
+            this.ui.background?.setStrokeStyle(1, 0xffffff);
             this.ui.background?.setFillStyle(0x112a12);
+            
         }
     }
 
