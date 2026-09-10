@@ -7,6 +7,8 @@ import StageDiscoveryTracker from './StageDiscoveryTracker.js';
 import StageSubNavigation from './StageSubNavigation.js';
 import * as df from '../../data/dataFunctions.js';
 
+import StageObjectives from './StageObjectives.js';
+
 export default class StageUI {
 
     constructor(scene, options = {}) {
@@ -234,17 +236,28 @@ export default class StageUI {
         this.navigation.setActiveTab(this.currentTab);
 
         // DISCOVERY TRACKER
-        this.discoveryTracker =
+        /*this.discoveryTracker =
             new StageDiscoveryTracker(this.scene, {
-                    x: this.topTabsContent_X,
-                    y: this.topTabsContent_Y,
-                    width: this.topTabsContent_W,
-                    height: this.topTabsContent_H,
-                    stageProgress: this.stageProgress,
-                    objectivesManager: this.objectivesManager,
-                    objectiveFlow: this.objectiveFlow
-                }
-            );
+                x: this.topTabsContent_X,
+                y: this.topTabsContent_Y,
+                width: this.topTabsContent_W,
+                height: this.topTabsContent_H,
+                stageProgress: this.stageProgress,
+                objectivesManager: this.objectivesManager,
+                objectiveFlow: this.objectiveFlow
+            });*/
+//// WIP
+        // TOP TABS ONLY
+        this.stageObjectives = 
+            new StageObjectives(this.scene, {
+                x: this.topTabsContent_X,
+                y: this.topTabsContent_Y,
+                width: this.topTabsContent_W,
+                height: this.topTabsContent_H,
+                objectivesManager: this.objectivesManager,
+                objectiveFlow: this.objectiveFlow,
+                isPointerVisible: pointer => this.isPointerVisible(pointer),
+            });
 
         this.updateTopTabContent();
         this.refreshCurrentTab();
@@ -469,7 +482,7 @@ export default class StageUI {
     }
 
     updateTopTabContent() {
-        this.discoveryTracker?.setVisible(
+        this.stageObjectives?.setVisible(
             this.currentTopTab === 'objectives'
         );
     
@@ -665,6 +678,11 @@ export default class StageUI {
         this.subNavigation.setTabs(
             this.getSubTabs()
         );
+    }
+
+    isPointerVisible(pointer) {
+        return this.viewport?.scrollBox
+            ?.isPointerInside(pointer) ?? true;
     }
 
     // Destroy

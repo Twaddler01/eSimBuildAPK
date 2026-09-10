@@ -63,15 +63,24 @@ export default class ObjectivesManager {
         ) ?? null;
     }
 
+    getStageObjectives() {
+        const stage =
+            this.getCurrentStageId();
+        return this.getAllObjectives()
+            .filter(objective =>
+                objective.stage === stage
+            );
+    }
+
     // Availability / for getCardCanAction() ('active' = true)
     getObjectiveAvailability(item) {
-        return this.isObjectiveActive(
+        return this.getObjectiveStatus(
             item.id
         );
     }
 
     // Helper ^ getObjectiveAvailability
-    isObjectiveActive(id) {
+    getObjectiveStatus(id) {
         const state =
             this.getObjectiveState(id);
 
@@ -100,7 +109,7 @@ export default class ObjectivesManager {
         return defaultReturn;
     }
 
-    // helper ^ isObjectiveActive
+    // helper ^ getObjectiveStatus
     getObjectiveState(id) {
         return this.objectiveState[id] ?? {
             unlocked: false,

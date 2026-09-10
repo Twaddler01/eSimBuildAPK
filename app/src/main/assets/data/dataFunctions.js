@@ -111,7 +111,7 @@ function buildCardData(
     };
 
     if (tab === 'create' && subTab === 'upgrades') {
-        tab = 'create-upgrwdes';
+        tab = 'create-upgrades';
     }
 
     // SPECIAL CASES
@@ -139,7 +139,7 @@ function buildCardData(
             data.getCardUpdates = () => 
                 stageProgress.getCardUpdates(item, requirements);
             break;
-        case 'create-upgrwdes':
+        case 'create-upgrades':
             data.getCardUpdates = () => // Calculates unlock
                 stageProgress.getCardUpdates(item, item.requirements);
 
@@ -439,4 +439,109 @@ export function getSubTabData(
                     : 'locked'
         };
     });
+}
+
+export function getObjectiveCardData(
+    objective,
+    objectivesManager
+) {
+    const id = objective.id;
+
+    return {
+        ...objective,
+
+        state:
+            objectivesManager
+                .getObjectiveStatus(id),
+
+        tracked:
+            objectivesManager
+                .isObjectiveTracked(id),
+
+        progress:
+            objectivesManager
+                .getObjectiveProgressData(id),
+
+        requirements:
+            objectivesManager
+                .getObjectiveRequirements(id),
+
+        unlocks:
+            objectivesManager
+                .objectiveUnlockList(objective)
+    };
+}
+
+export function getObjectiveSections(
+    objectivesManager
+) {
+    const sections = {
+        tracking: [],
+        active: [],
+        completed: [],
+        locked: []
+    };
+
+    const objectives =
+        objectivesManager.getStageObjectives();
+
+    objectives.forEach(objective => {
+
+        const data =
+            getObjectiveCardData(
+                objective,
+                objectivesManager
+            );
+
+        if (
+            data.tracked &&
+            data.state !== 'completed' &&
+            data.state !== 'locked'
+        ) {
+            sections.tracking.push(data);
+        }
+
+        switch (data.state) {
+        
+            case 'unlocked':
+            case 'active':
+                sections.active.push(data);
+                break;
+        
+            case 'completed':
+                sections.completed.push(data);
+                break;
+        
+            case 'locked':
+                sections.locked.push(data);
+                break;
+        }
+    });
+
+    return sections;
+}
+
+export function getObjectiveCardMode(objective) {
+
+    if (
+        objective.tracked &&
+        objective.state !== 'completed' &&
+        objective.state !== 'locked'
+    ) {
+        return 'tracking';
+    }
+
+    switch (objective.state) {
+
+        case 'active':
+        case 'unlocked':
+            return 'active';
+
+        case 'completed':
+            return 'completed';
+
+        case 'locked':
+        default:
+            return 'locked';
+    }
 }

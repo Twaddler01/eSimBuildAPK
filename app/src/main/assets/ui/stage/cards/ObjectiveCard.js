@@ -1,9 +1,11 @@
-import { listenToEvent } from '../../utils/stageHelpers.js';
+import { listenToEvent } from '../../../utils/stageHelpers.js';
 
-export default class TrackerCard {
+export default class ObjectiveCard {
 
     constructor(scene, options = {}) {
         this.scene = scene;
+// NEW
+        this.mode = options.mode ?? 'tracking';
 
         this.x = options.x ?? 0;
         this.y = options.y ?? 0;
@@ -14,7 +16,7 @@ export default class TrackerCard {
         this.objectiveId = this.objective?.id ?? null;
 
         this.objectivesManager = options.objectivesManager ?? null;
-        this.unlocksItems = options.unlocksItems ?? null;
+        this.unlocks = options.unlocks ?? null;
         this.objectiveFlow = options.objectiveFlow ?? null;
         
         // To disable interactions outside of scroll area
@@ -63,6 +65,42 @@ export default class TrackerCard {
         return this.scrollBox.isPointerInside(pointer);
     }
 
+/* POTENTIAL FUNCTIONS
+createTrackingCard() {
+    this.createBase();
+    this.createTitle();
+    this.createTrackingControl();
+    this.createDescription();
+    this.createRequirements();
+    this.createProgress();
+    this.createUnlocks();
+    this.createCompleteButton();
+    this.finalizeHeight();
+}
+*/
+    NEWcreate() {
+        switch (this.mode) {
+            case 'tracking':
+                this.createTrackingCard();
+                break;
+            case 'active':
+                this.createActiveCard();
+                break;
+            case 'completed':
+                this.createCompletedCard();
+                break;
+            case 'locked':
+                this.createLockedCard();
+                break;
+            default:
+                this.createLockedCard();
+                break;
+        }
+    }
+
+
+
+// WIP REVAMP
     // CREATE
     create() {
         this.background =
@@ -214,7 +252,7 @@ export default class TrackerCard {
             34 + 17;
 
         // Unlocks Objectives
-        if (this.unlocksItems.objectives.length > 0) {
+        if (this.unlocks.objectives.length > 0) {
             this.unlocksObjTextTitle =
                 this.addElement(
                     addText(
@@ -238,7 +276,7 @@ export default class TrackerCard {
                         this.scene,
                         15,
                         currentY,
-                        this.unlocksItems.objectives.map(obj => `- ${obj}`).join('\n'),
+                        this.unlocks.objectives.map(obj => `- ${obj}`).join('\n'),
                         {
                             fontSize: '15px',
                             color: '#ffffff'
@@ -251,7 +289,7 @@ export default class TrackerCard {
         }
 
         // Unlocks items
-        if (this.unlocksItems.items.length > 0) {
+        if (this.unlocks.items.length > 0) {
             this.unlocksItemsTextTitle =
                 this.addElement(
                     addText(
@@ -275,7 +313,7 @@ export default class TrackerCard {
                         this.scene,
                         15,
                         currentY,
-                        this.unlocksItems.items.map(item => `- ${item}`).join('\n'),
+                        this.unlocks.items.map(item => `- ${item}`).join('\n'),
                         {
                             fontSize: '15px',
                             color: '#ffffff'

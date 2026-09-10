@@ -61,9 +61,9 @@ export default class StageInventory {
             new ScrollBox(
                 this.scene,
                 {
-                    x: this.x + 20,
+                    x: this.x,
                     y: this.y + 20,
-                    width: this.width - 40,
+                    width: this.width,
                     height: this.height - 40,
                     depth: this.depth,
                     maskPadding: 3

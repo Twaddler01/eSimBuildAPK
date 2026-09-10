@@ -19,6 +19,18 @@ export default class ScrollBox {
         this.maskPadding =
             options.maskPadding ?? 2;
 
+        this.dragThreshold =
+            options.dragThreshold ?? 10;
+
+        this.onDragStart =
+            options.onDragStart ?? null;
+        
+        this.onDragEnd =
+            options.onDragEnd ?? null;
+        
+        this.dragPointerId = null;
+        this.didDrag = false;
+
         this.scrollY = 0;
         this.maxScrollY = 0;
 
@@ -99,56 +111,96 @@ export default class ScrollBox {
         // Touch scrolling
         // ---------------------------------------------
 
-        this.isDragging = false;
-        this.dragStartY = 0;
-        this.scrollStartY = 0;
-
-        this.scrollZone.on(
+        this.scene.input.on(
             'pointerdown',
-            pointer => {
-
-                this.isDragging = true;
-
-                this.dragStartY =
-                    pointer.y;
-
-                this.scrollStartY =
-                    this.scrollY;
-            }
+            this.handlePointerDown,
+            this
         );
-
-        this.scrollZone.on(
+        
+        this.scene.input.on(
             'pointermove',
-            pointer => {
-
-                if (!this.isDragging) {
-                    return;
-                }
-
-                const deltaY =
-                    pointer.y -
-                    this.dragStartY;
-
-                this.setScroll(
-                    this.scrollStartY -
-                    deltaY
-                );
-            }
+            this.handlePointerMove,
+            this
         );
-
-        this.scrollZone.on(
+        
+        this.scene.input.on(
             'pointerup',
-            () => {
-                this.isDragging = false;
-            }
+            this.handlePointerUp,
+            this
         );
+    }
 
-        this.scrollZone.on(
-            'pointerout',
-            () => {
-                this.isDragging = false;
+    handlePointerDown(pointer) {
+        if (!this.isPointerInside(pointer)) {
+            return;
+        }
+    
+        this.isDragging = false;
+        this.didDrag = false;
+    
+        this.dragPointerId =
+            pointer.id;
+    
+        this.dragStartY =
+            pointer.y;
+    
+        this.scrollStartY =
+            this.scrollY;
+    }
+    
+    handlePointerMove(pointer) {
+    
+        if (
+            this.dragPointerId !==
+            pointer.id
+        ) {
+            return;
+        }
+    
+        const deltaY =
+            pointer.y -
+            this.dragStartY;
+    
+        if (!this.isDragging) {
+    
+            if (
+                Math.abs(deltaY) <
+                this.dragThreshold
+            ) {
+                return;
             }
+    
+            this.isDragging = true;
+            this.didDrag = true;
+    
+            this.onDragStart?.();
+        }
+    
+        this.setScroll(
+            this.scrollStartY -
+            deltaY
         );
+    }
+    
+    handlePointerUp(pointer) {
+    
+        if (
+            this.dragPointerId !==
+            pointer.id
+        ) {
+            return;
+        }
+    
+        if (this.isDragging) {
+            this.onDragEnd?.();
+        }
+    
+        this.isDragging = false;
+        this.dragPointerId = null;
+    }
+    
+    wasDragged() {
+        return this.didDrag;
     }
 
     // To disable interactions outside of scroll area
