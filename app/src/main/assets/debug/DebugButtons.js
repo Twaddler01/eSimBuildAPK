@@ -2,7 +2,7 @@ import { allCardData } from '../data/stageData.js';
 
 export default class DebugButtons {
 
-    constructor(scene) {
+    constructor(scene, options = {}) {
         this.scene = scene;
         this.saveManager = this.scene.registry.get('saveManager');
         
@@ -13,8 +13,8 @@ export default class DebugButtons {
         // Place on top of everything
         this.container.setDepth(1000);
 
-        this.x = 50;
-        this.y = 150;
+        this.x = options.x ?? 50;
+        this.y = options.y ?? 150;
 
         this.buttonWidth = 180;
         this.buttonHeight = 40;

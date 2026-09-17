@@ -51,9 +51,9 @@ export default class StageUI {
         this.topTabs_H = 60; // Top tabs navigation
         
         // Tab content area this.topTabsContent
-        this.topTabsContent_X = 0;
+        this.topTabsContent_X = 15;
         this.topTabsContent_Y = this.tabHeader_Y + this.topTabs_H + 1;
-        this.topTabsContent_W = this.width;
+        this.topTabsContent_W = this.width - 30;
         this.topTabsContent_H = this.tabHeader_H - this.topTabs_H;
 
         // Under headers starting Y
@@ -257,6 +257,8 @@ export default class StageUI {
                 objectivesManager: this.objectivesManager,
                 objectiveFlow: this.objectiveFlow,
                 isPointerVisible: pointer => this.isPointerVisible(pointer),
+                topTabsContentGradient: this.topTabsContentGradient
+                //this.scene.children.bringToTop(this.topTabsContentGradient);
             });
 
         this.updateTopTabContent();
@@ -313,8 +315,8 @@ export default class StageUI {
     }
 
     createTopTabsContentBackground() {
-        const screenY = this.topTabsContent_Y;
-        const screenH = this.topTabsContent_H;
+        const screenY = this.topTabsContent_Y - 2 - 2;
+        const screenH = this.topTabsContent_H + 2;
     
         this.topTabsContentGradient =
             this.scene.add.graphics();
@@ -323,7 +325,7 @@ export default class StageUI {
         const steps = 12;
     
         // Top fade
-        for (let i = 0; i < steps; i++) {
+        for (let i = 2; i < steps; i++) {
     
             const progress = i / steps;
             const alpha = 0.35 * (1 - progress);

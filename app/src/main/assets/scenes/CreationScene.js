@@ -87,7 +87,10 @@ export default class CreationScene extends Phaser.Scene {
 //// Debugging
 if (DEBUG) {
     this.debugButtons = 
-        new DebugButtons(this);
+        new DebugButtons(this, {
+            x: 0,
+            y: this.scale.height / 2
+        });
 }
 ////
 

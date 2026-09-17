@@ -14,6 +14,9 @@ export default class StageObjectives {
 
         this.objectiveFlow =
             options.objectiveFlow;
+            
+        this.topTabsContentGradient =
+            options.topTabsContentGradient;
 
         this.x = options.x ?? 0;
         this.y = options.y ?? 0;
@@ -40,7 +43,7 @@ export default class StageObjectives {
 
             active: {
                 title: 'ACTIVE',
-                expanded: true,
+                expanded: false,
                 cards: []
             },
 
@@ -118,7 +121,7 @@ export default class StageObjectives {
                 this.scene,
                 this.x + 12,
                 y + headerHeight / 2,
-                section.expanded ? '▼' : '▶',
+                section.expanded ? '–' : '+',
                 {
                     fontSize: '18px',
                     color: '#33FFE4'
@@ -194,7 +197,7 @@ export default class StageObjectives {
     }
 
     refresh() {
-    const sections =
+        const sections =
             df.getObjectiveSections(this.objectivesManager);
 
         // Destroy existing cards
@@ -320,6 +323,8 @@ export default class StageObjectives {
                 y += 8;
             });
     
+        this.container.add(this.topTabsContentGradient);
+
         this.scrollBox.setContentHeight(y);
     }
 
