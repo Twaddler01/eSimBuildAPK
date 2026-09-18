@@ -528,15 +528,17 @@ export function getObjectiveCardMode(objective) {
         objective.state !== 'completed' &&
         objective.state !== 'locked'
     ) {
-        return 'tracking';
+// WIP remove tracking
+        //return 'tracking';
+        return 'active';
     }
 
     switch (objective.state) {
 
         case 'active':
+            return 'active';
         case 'unlocked':
             return 'active';
-
         case 'completed':
             return 'completed';
 

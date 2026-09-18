@@ -33,7 +33,7 @@ export default class ObjectiveCard {
         //this.create();
         this.NEW_create();
         
-        //this.update();
+        this.update();
 
         this.removeObjectiveListener =
             listenToEvent(
@@ -83,16 +83,16 @@ createTrackingCard() {
     NEW_create() {
 
         this.createDefaults();
-        
+
         switch (this.mode) {
             case 'active':
-                //this.createActiveCard();
+                this.createActiveCard();
                 break;
             case 'completed':
                 //this.createCompletedCard();
                 break;
             case 'locked':
-                //this.createLockedCard();
+                this.createLockedCard();
                 break;
             default:
                 //this.createLockedCard();
@@ -110,40 +110,40 @@ createTrackingCard() {
     }
 
     createBackground() {
-        
         this.background =
             this.addElement(
                 this.scene.add.rectangle(
                     0,
                     5,
                     this.width,
-                    100,
-                    0x000022
+                    20,
+                    0x000033
                 )
                 .setOrigin(0)
+                .setStrokeStyle(1, 0x777777)
             );
     }
 
     createTitle() {
         this.titleText =
             this.addElement(
-                addText(
-                    this.scene,
+                addText(this.scene,
                     this.width / 2,
                     10,
                     this.objective.title,
                     {
-                        fontSize: '22px',
+                        fontSize: '44px',
                         color: '#ffffff'
                     }
                 )
             .setOrigin(0.5, 0)
         );
 
-        this.height = this.titleText.y + this.titleText.height + 10;
+        // Set initial height for all cards
+        this.height = this.titleText.y + this.titleText.height + 30;
         
-        // Final height
-        this.background.height = this.height;
+        // Final
+        this.background.setSize(this.width, this.height);
     }
 
 //////////////////////////////////////////
@@ -151,12 +151,359 @@ createTrackingCard() {
 //////////////////////////////////////////
 
     createActiveCard() {
+
+        // DESCRIPTION
+        this.descriptionText =
+            this.addElement(
+                addText(this.scene,
+                    this.width / 2,
+                    this.height,
+                    this.objective.description ?? '...',
+                    {
+                        fontSize: '22px',
+                        color: '#cccccc',
+                        wordWrap: {
+                            width: this.width - 20
+                        }
+                    }
+                )
+                .setOrigin(0.5, 0)
+            );
         
+        this.height += this.descriptionText.height + 20;
+
+        let objHeight = 0;
+        // PARENT OBJECTIVE
+        if (this.objective.type === 'parent') {
+            objHeight = this.createParentDisplay();
+        }
+        // NORMAL OBJECTIVE
+        else {
+            objHeight = this.createRequirementDisplay();
+        }
+        this.height += objHeight + 20;
+
+        const completeButtonHeight = this.createCompleteButton();
+        this.height += completeButtonHeight;
+
+        // Final
+        this.background.setSize(this.width, this.height);
+
+    }
+
+    // helper ^ createActiveCard()
+    // Complete button
+    createCompleteButton() {
+
+        const buttonH = 40;
+        this.completeButton =
+            this.addElement(
+                this.scene.add.rectangle(
+                    this.width / 2,
+                    this.height,
+                    200,
+                    buttonH,
+                    0x335533
+                )
+                .setOrigin(0.5, 0)
+                .setStrokeStyle(1, 0x66aa66)
+                .setInteractive({
+                    useHandCursor: true
+                })
+            );
+        
+        this.completeButtonText =
+            this.addElement(
+                addText(this.scene,
+                    this.completeButton.x,
+                    this.completeButton.y + this.completeButton.height / 2,
+                    'COMPLETE',
+                    {
+                        fontSize: '22px',
+                        color: '#ffffff'
+                    }
+                )
+                .setOrigin(0.5, 0.5)
+            );
+        
+        this.completeButton.on(
+            'pointerdown',
+            pointer => {
+                if (!this.isPointerVisible(pointer)) {
+                    return;
+                }
+        
+                this.objectiveFlow.completeObjective(
+                    this.objective.id
+                );
+            }
+        );
+        
+        return buttonH + 20;
+  
+    }
+
+    // helper ^ createActiveCard()
+    // PARENT DISPLAY
+    createParentDisplay() {
+        let currentY = this.height;
+        
+        const children =
+            this.objective.children ?? [];
+
+        // Overall progress
+        this.progressTextOverall =
+            this.addElement(
+                addText(this.scene,
+                    10,
+                    currentY,
+                    '',
+                    {
+                        fontSize: '30px',
+                        color: '#ffffff'
+                    }
+                )
+            );
+
+        currentY +=
+            22;
+
+        // Parent item requirements
+        const itemRequirements =
+            this.objective.requirements?.items ?? [];
+    
+        itemRequirements.forEach(
+            requirement => {
+                Object.entries(requirement)
+                    .forEach(
+                        ([id, required]) => {
+    
+                            const text =
+                                this.addElement(
+                                    addText(
+                                        this.scene,
+                                        10,
+                                        currentY,
+                                        '',
+                                        {
+                                            fontSize: '30px',
+                                            color: '#ffffff'
+                                        }
+                                    )
+                                );
+    
+                            this.requirements.push({
+                                id,
+                                required,
+                                text
+                            });
+    
+                            currentY += 20;
+                        }
+                    );
+            }
+        );
+
+        // Individual children
+        children.forEach(
+            childId => {
+
+                const child =
+                    this.objectivesManager.getObjective(
+                        childId
+                    );
+
+                if (!child) {
+                    return;
+                }
+
+                const text =
+                    this.addElement(
+                        addText(this.scene,
+                            10,
+                            currentY,
+                            '',
+                            {
+                                fontSize: '30px',
+                                color: '#ffffff'
+                            }
+                        )
+                    );
+
+
+                this.childEntries.push({
+                    id: childId,
+                    objective: child,
+                    text
+                });
+
+
+                currentY += 20;
+            }
+        );
+
+        return currentY;
+    }
+
+    // helper ^ createActiveCard()
+    // NORMAL REQUIREMENTS
+    createRequirementDisplay() {
+
+        let thisY = this.height;
+        // Special objective text
+        if (this.objective.objectiveText) {
+            this.objectiveTextDisplay =
+                this.addElement(
+                    addText(this.scene,
+                        this.width / 2,
+                        thisY,
+                        this.objective.objectiveText,
+                        {
+                            fontSize: '22px',
+                            color: '#ffffff',
+                            wordWrap: {
+                                width: this.width - 20
+                            }
+                        }
+                    )
+                    .setOrigin(0.5, 0)
+                );
+
+            return this.objectiveTextDisplay.height;
+        }
+jp(this.objective);
+        // Item requirements
+        const itemRequirements =
+            this.objective.requirements ?? [];
+
+        itemRequirements.forEach(
+            req => {
+
+                const text =
+                    this.addElement(
+                        addText(this.scene,
+                            10,
+                            thisY,
+                            '...',
+                            {
+                                fontSize: '22px',
+                                color: '#ffffff'
+                            }
+                        )
+                    );
+
+
+                this.requirements.push({
+                    id: req.id,
+                    required: req.required,
+                    text
+                });
+
+
+                thisY += 20;
+            }
+        );
+
+        return thisY;
     }
 
     createCompletedCard() {
         
     }
+
+    createLockedCard() {
+        
+        this.background.setFillStyle(0x111111);
+
+        this.lockOverlay =
+            this.addElement(
+                this.scene.add.rectangle(
+                    0,
+                    5,
+                    this.width,
+                    100,
+                    0x000000,
+                    0.75
+                )
+            .setOrigin(0)
+            .setStrokeStyle(1, 0x555555)
+        );
+
+        this.height = this.lockOverlay.height;
+
+        this.availabilityText =
+            this.addElement(
+                addText(this.scene,
+                    this.width / 2,
+                    this.height / 2,
+                    'LOCKED',
+                    {
+                        fontSize: '18px',
+                        color: '#ffffff'
+                    }
+                )
+            .setOrigin(0.5)
+        );
+    
+        // Final
+        this.background.setSize(this.width, this.height);
+    }
+
+    update() {
+        jp('update...');
+        this.updateRequirements();
+
+        
+    }
+
+    // UPDATE NORMAL REQUIREMENTS
+    updateRequirements() {
+        this.requirements.forEach(
+            requirement => {
+
+                const amount =
+                    this.objectivesManager.get(
+                        requirement.id
+                    );
+
+
+                const ready =
+                    amount >= requirement.required;
+
+
+                const item =
+                    this.objectivesManager.getItem(
+                        requirement.id
+                    );
+
+
+                const title =
+                    item?.title ??
+                    requirement.id;
+
+
+                requirement.text.setText(
+                    `${title}: ` +
+                    `${Math.floor(amount)} / ` +
+                    `${requirement.required} ` +
+                    `${ready ? '✓' : '✕'}`
+                );
+
+
+                requirement.text.setColor(
+                    ready
+                        ? '#66ff66'
+                        : '#ff6666'
+                );
+            }
+        );
+    }
+
+
+
+
+
+/*
 
 // WIP REVAMP
     // CREATE
@@ -757,7 +1104,7 @@ createTrackingCard() {
             }
         );
     }
-
+*/
     // DESTROY
     destroy() {
         this.removeObjectiveListener?.()

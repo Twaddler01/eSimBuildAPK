@@ -35,12 +35,6 @@ export default class StageObjectives {
 
         this.sections = {
 
-            /*tracking: {
-                title: 'TRACKING',
-                expanded: true,
-                cards: []
-            },*/
-
             active: {
                 title: 'ACTIVE',
                 expanded: false,

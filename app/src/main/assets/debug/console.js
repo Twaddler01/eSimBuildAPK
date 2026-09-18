@@ -269,8 +269,8 @@ console.render = function(cssClass, items, prefix) {
 
         // Strings
         if (typeof i === 'string') {
-            if (i.length > 300) {
-                return i.substring(0, 300).htmlEncode() + '...';
+            if (i.length > 5000) {
+                return i.substring(0, 5000).htmlEncode() + '...';
             }
 
             return i.htmlEncode();
