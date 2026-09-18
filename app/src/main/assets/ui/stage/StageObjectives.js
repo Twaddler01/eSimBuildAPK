@@ -35,11 +35,11 @@ export default class StageObjectives {
 
         this.sections = {
 
-            tracking: {
+            /*tracking: {
                 title: 'TRACKING',
                 expanded: true,
                 cards: []
-            },
+            },*/
 
             active: {
                 title: 'ACTIVE',
@@ -212,117 +212,119 @@ export default class StageObjectives {
     
         this.scrollBox.content.removeAll(true);
     
-        let y = 8;
+        let y = 5;
     
         Object.entries(this.sections)
             .forEach(([id, section]) => {
     
-                const objectives =
-                    sections[id];
-    
-                const header =
-                    this.createSectionHeader(
-                        section,
-                        y
+            const objectives =
+                sections[id];
+
+            const header =
+                this.createSectionHeader(
+                    section,
+                    y
+                );
+
+            this.scrollBox.content.add(
+                header.background
+            );
+
+            this.scrollBox.content.add(
+                header.arrow
+            );
+
+            this.scrollBox.content.add(
+                header.title
+            );
+
+            this.scrollBox.content.add(
+                header.count
+            );
+
+            header.count.setText(
+                `(${objectives.length})`
+            );
+
+            y += header.height;
+            
+            // Section is collapsed.
+            if (!section.expanded) {
+                y += 6;
+                return;
+            }
+
+            // --------------------------------
+            // Cards will go here
+            // --------------------------------
+
+            if (objectives.length === 0) {
+
+                const emptyText =
+                    addText(
+                        this.scene,
+                        this.x + 16,
+                        y + 12,
+                        'EMPTY',
+                        {
+                            fontSize: '16px',
+                            color: '#666666'
+                        }
                     );
-    
+
                 this.scrollBox.content.add(
-                    header.background
+                    emptyText
                 );
-    
-                this.scrollBox.content.add(
-                    header.arrow
-                );
-    
-                this.scrollBox.content.add(
-                    header.title
-                );
-    
-                this.scrollBox.content.add(
-                    header.count
-                );
-    
-                header.count.setText(
-                    `(${objectives.length})`
-                );
-    
-                y += header.height;
-    
-                // Section is collapsed.
-                if (!section.expanded) {
-                    y += 6;
-                    return;
-                }
-    
-                // --------------------------------
-                // Cards will go here
-                // --------------------------------
-    
-                if (objectives.length === 0) {
-    
-                    const emptyText =
-                        addText(
+
+                y += 40;
+
+            } else {
+                objectives.forEach(objective => {
+                    const mode =
+                        df.getObjectiveCardMode(objective);
+                
+                    const card =
+                        new ObjectiveCard(
                             this.scene,
-                            this.x + 16,
-                            y + 12,
-                            'None',
                             {
-                                fontSize: '16px',
-                                color: '#666666'
+                                x: this.x,
+                                y,
+                                width: this.width,
+                
+                                objective,
+                
+                                mode,
+                                
+                                unlocks:
+                                    objective.unlocks,
+                
+                                objectivesManager:
+                                    this.objectivesManager,
+                
+                                objectiveFlow:
+                                    this.objectiveFlow,
+                
+                                scrollBox:
+                                    this.scrollBox
                             }
                         );
-    
-                    this.scrollBox.content.add(
-                        emptyText
-                    );
-    
-                    y += 40;
-    
-                } else {
                 
-                    objectives.forEach(objective => {
-                        const mode =
-                            df.getObjectiveCardMode(objective);
-                    
-                        const card =
-                            new ObjectiveCard(
-                                this.scene,
-                                {
-                                    x: this.x,
-                                    y,
-                                    width: this.width,
-                    
-                                    objective,
-                    
-                                    mode,
-                                    
-                                    unlocks:
-                                        objective.unlocks,
-                    
-                                    objectivesManager:
-                                        this.objectivesManager,
-                    
-                                    objectiveFlow:
-                                        this.objectiveFlow,
-                    
-                                    scrollBox:
-                                        this.scrollBox
-                                }
-                            );
-                    
-                        section.cards.push(card);
-                    
-                        this.scrollBox.content.add(
-                            card.container
-                        );
-                    
-                        y += card.height + 8;
-                    });
-                }
-    
-                y += 8;
-            });
-    
+                    section.cards.push(card);
+                
+                    this.scrollBox.content.add(
+                        card.container
+                    );
+                
+                    y += card.height + 5;
+                });
+                
+            y += 5;
+            
+            }
+        });
+        
+        // Match content y
+        this.topTabsContentGradient.setY(5);
         this.container.add(this.topTabsContentGradient);
 
         this.scrollBox.setContentHeight(y);

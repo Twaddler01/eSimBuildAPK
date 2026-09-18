@@ -8,6 +8,7 @@ export default class DebugButtons {
         
         this.stageProgress = this.scene.stageProgress;
         this.objectivesManager = this.scene.objectivesManager;
+        this.objectiveFlow = this.scene.objectiveFlow;
 
         this.container = this.scene.add.container();
         // Place on top of everything
@@ -60,8 +61,8 @@ this.addButton('Show current savedData', () => {
     this.saveManager.debug();
 });
 ////
-this.addButton('VIEW allCardData', () => {
-    console.log(JSON.stringify(allCardData, null, 2));
+this.addButton('UNLOCK FIRST OBJ', () => {
+    this.objectiveFlow.completeObjective('the_beginning');
 });
 ////
 this.addButton('getObjectiveData', () => {

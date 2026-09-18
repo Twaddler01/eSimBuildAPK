@@ -5,7 +5,7 @@ export default class ObjectiveCard {
     constructor(scene, options = {}) {
         this.scene = scene;
 // NEW
-        this.mode = options.mode ?? 'tracking';
+        this.mode = options.mode ?? 'active';
 
         this.x = options.x ?? 0;
         this.y = options.y ?? 0;
@@ -30,10 +30,12 @@ export default class ObjectiveCard {
         // ALL elements (tab container)
         this.elements = [];
 
-        this.create();
-        this.update();
+        //this.create();
+        this.NEW_create();
+        
+        //this.update();
 
-        /*this.removeObjectiveListener =
+        this.removeObjectiveListener =
             listenToEvent(
                 this.objectivesManager,
                 'updated',
@@ -47,7 +49,7 @@ export default class ObjectiveCard {
                         this.update();
                     }
                 }
-            );*/
+            );
     }
 
     // ELEMENT HELPERS
@@ -78,27 +80,83 @@ createTrackingCard() {
     this.finalizeHeight();
 }
 */
-    NEWcreate() {
+    NEW_create() {
+
+        this.createDefaults();
+        
         switch (this.mode) {
-            case 'tracking':
-                this.createTrackingCard();
-                break;
             case 'active':
-                this.createActiveCard();
+                //this.createActiveCard();
                 break;
             case 'completed':
-                this.createCompletedCard();
+                //this.createCompletedCard();
                 break;
             case 'locked':
-                this.createLockedCard();
+                //this.createLockedCard();
                 break;
             default:
-                this.createLockedCard();
+                //this.createLockedCard();
                 break;
         }
     }
 
+//////////////////////////////////////////
+// CREATE CARD DEFAULTS
+//////////////////////////////////////////
 
+    createDefaults() {
+        this.createBackground();
+        this.createTitle();
+    }
+
+    createBackground() {
+        
+        this.background =
+            this.addElement(
+                this.scene.add.rectangle(
+                    0,
+                    5,
+                    this.width,
+                    100,
+                    0x000022
+                )
+                .setOrigin(0)
+            );
+    }
+
+    createTitle() {
+        this.titleText =
+            this.addElement(
+                addText(
+                    this.scene,
+                    this.width / 2,
+                    10,
+                    this.objective.title,
+                    {
+                        fontSize: '22px',
+                        color: '#ffffff'
+                    }
+                )
+            .setOrigin(0.5, 0)
+        );
+
+        this.height = this.titleText.y + this.titleText.height + 10;
+        
+        // Final height
+        this.background.height = this.height;
+    }
+
+//////////////////////////////////////////
+// CREATE SPECIFIC CARDS
+//////////////////////////////////////////
+
+    createActiveCard() {
+        
+    }
+
+    createCompletedCard() {
+        
+    }
 
 // WIP REVAMP
     // CREATE
@@ -133,39 +191,6 @@ createTrackingCard() {
                     }
                 )
             );
-
-        // TRACKING
-        this.trackStatus =
-            this.addElement(
-                addText(
-                    this.scene,
-                    this.width - 60,
-                    5,
-                    'UNTRACK',
-                    {
-                        fontSize: '12px',
-                        color: '#ece75f'
-                    }
-                )
-                .setInteractive({
-                    useHandCursor: true
-                })
-            );
-        
-        this.trackStatus.on(
-            'pointerdown',
-            pointer => {
-                if (!this.isPointerVisible(pointer)) {
-                    return;
-                }
-        
-                this.objectivesManager
-                    .setObjectiveTracked(
-                        this.objective.id,
-                        false
-                    );
-            }
-        );
 
         // DESCRIPTION
         this.descriptionText =
