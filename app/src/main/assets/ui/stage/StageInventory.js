@@ -140,7 +140,7 @@ export default class StageInventory {
                         y,
                         category.toUpperCase(),
                         {
-                            fontSize: '14px',
+                            fontSize: '36px',
                             color: '#ffffff'
                         }
                     );
@@ -149,7 +149,7 @@ export default class StageInventory {
                     categoryText
                 );
 
-                y += 20;
+                y += categoryText.height + 5;
 
                 // Items
                 items.forEach(
@@ -164,7 +164,7 @@ export default class StageInventory {
                                 
                                 `${item.title ?? item.id}: ${Math.floor(amount)}${itemMax}`,
                                 {
-                                    fontSize: '16px',
+                                    fontSize: '28px',
                                     color:
                                         this.getCategoryColor(
                                             category
@@ -181,7 +181,7 @@ export default class StageInventory {
                             text
                         });
                         
-                        y += 22;
+                        y += text.height + 5;
 
                     }
                 );
