@@ -520,7 +520,7 @@ export default class ObjectivesManager {
     
         const itemRequirements =
             objective.requirements?.items ?? [];
-    
+
         itemRequirements.forEach(requirement => {
     
             Object.entries(requirement)
@@ -535,14 +535,14 @@ export default class ObjectivesManager {
                     });
                 });
         });
-    
+
         return requirements;
     }
 
     getObjectiveProgressData(id) {
         const objective =
             this.getObjective(id);
-    
+
         if (!objective) {
             return {
                 completed: 0,
@@ -629,7 +629,7 @@ export default class ObjectivesManager {
         // Normal objective
         const requirements =
             this.getObjectiveRequirements(id);
-    
+
         const total =
             requirements.length;
     
@@ -638,7 +638,8 @@ export default class ObjectivesManager {
                 completed: 0,
                 total: 0,
                 percent: 1,
-                ready: true
+                ready: true,
+                //startsUnlocked: true
             };
         }
 

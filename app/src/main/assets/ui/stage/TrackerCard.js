@@ -586,9 +586,7 @@ export default class TrackerCard {
                 `${progress.completed} / ${progress.total}`
             );
         } else {
-            this.progressText?.setText(
-                'Ready to complete'
-            );
+            this.progressText?.setText('Ready to complete');
         }
     
         // Objective-specific display

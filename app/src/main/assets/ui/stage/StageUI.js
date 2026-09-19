@@ -6,7 +6,6 @@ import { getItemMax, listenToEvent } from '../../utils/stageHelpers.js';
 import StageDiscoveryTracker from './StageDiscoveryTracker.js';
 import StageSubNavigation from './StageSubNavigation.js';
 import * as df from '../../data/dataFunctions.js';
-
 import StageObjectives from './StageObjectives.js';
 
 export default class StageUI {
@@ -256,6 +255,7 @@ export default class StageUI {
                 height: this.topTabsContent_H,
                 objectivesManager: this.objectivesManager,
                 objectiveFlow: this.objectiveFlow,
+                stageProgress: this.stageProgress,
                 isPointerVisible: pointer => this.isPointerVisible(pointer),
                 topTabsContentGradient: this.topTabsContentGradient
                 //this.scene.children.bringToTop(this.topTabsContentGradient);

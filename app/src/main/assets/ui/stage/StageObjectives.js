@@ -14,7 +14,10 @@ export default class StageObjectives {
 
         this.objectiveFlow =
             options.objectiveFlow;
-            
+
+        this.stageProgress =
+            options.stageProgress;
+
         this.topTabsContentGradient =
             options.topTabsContentGradient;
 
@@ -56,17 +59,29 @@ export default class StageObjectives {
         };
 
         this.create();
+        this.refresh();
 
-        this.removeObjectiveListener =
+        this.removeFlowListener =
             listenToEvent(
-                this.objectivesManager,
+                this.objectiveFlow,
                 'updated',
-                () => {
-                    this.refresh();
+                event => {
+                    if (event.type === 'flow-complete') {
+                        this.refresh();
+                    }
                 }
             );
-
-        this.refresh();
+            
+        this.removeProgressListener =
+            listenToEvent(
+                this.stageProgress,
+                'updated',
+                event => {
+                    if (event.type === 'item-amount') {
+                        this.updateCards();
+                    }
+                }
+            );
     }
 
     addElement(element) {
@@ -324,6 +339,15 @@ export default class StageObjectives {
         this.scrollBox.setContentHeight(y);
     }
 
+    updateCards() {
+        Object.values(this.sections)
+            .forEach(section => {
+                section.cards.forEach(card => {
+                    card.update();
+                });
+            });
+    }
+
     // For scrollBox
     isPointerVisible(pointer) {
         if (!this.scrollBox) {
@@ -333,7 +357,8 @@ export default class StageObjectives {
     }
 
     destroy() {
-        this.removeObjectiveListener?.();
+        this.removeProgressListener?.();
+        this.removeFlowListener?.();
 
         Object.values(this.sections)
             .forEach(section => {
